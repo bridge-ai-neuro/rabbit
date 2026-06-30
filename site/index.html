@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="RABBiT — Speech-to-fMRI Foundation Model">
 <meta name="twitter:description" content="Predicts a new person's speech-evoked fMRI from audio alone — zero-shot, adapts in ~10 min. Try the live in-browser demo.">
 <meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
-<link rel="stylesheet" href="assets/style.css?v=2">
+<link rel="stylesheet" href="assets/style.css?v=3">
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
 <!-- KaTeX for in-page LaTeX math rendering (formulas in the architecture section) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
@@ -53,20 +53,20 @@
   </div>
 </nav>
 
-<!-- ─── Floating sidebar TOC (fixed, right edge) ──────────────────── -->
-<aside class="toc" aria-label="Page navigation">
-  <div class="toc-label">On this page</div>
-  <ul>
-    <li><a href="#top">Overview</a></li>
-    <li><a href="#what">Two ways to use it</a></li>
-    <li><a href="#foundation">A language network</a></li>
-    <li><a href="#zeroshot">Zero-shot: a new brain</a></li>
-    <li><a href="#fewshot">Few-shot: ten minutes</a></li>
-    <li><a href="#how">How it works</a></li>
-    <li><a href="#resources">Resources</a></li>
-    <li><a href="#cite">Cite</a></li>
-  </ul>
-</aside>
+<!-- Scroll-progress bar (phone + tablet, where the chapter rail is hidden). -->
+<div class="scroll-progress" aria-hidden="true"></div>
+
+<!-- ─── Chapter rail — chromeless scroll-progress spine in the right gutter ── -->
+<nav class="chapter-rail" aria-label="Sections">
+  <a href="#top"        aria-label="Overview"            style="--sec:var(--ink-mute)"><span class="lab"><span class="ix">00</span><span class="ti">Overview</span></span></a>
+  <a href="#what"       aria-label="Two ways to use it"  style="--sec:var(--ink-mute)"><span class="lab"><span class="ix">01</span><span class="ti">Two ways to use it</span></span></a>
+  <a href="#foundation" aria-label="A language network"  style="--sec:var(--teal)"><span class="lab"><span class="ix">02</span><span class="ti">A language network</span></span></a>
+  <a href="#zeroshot"   aria-label="Zero-shot"           style="--sec:var(--steel)"><span class="lab"><span class="ix">03</span><span class="ti">Zero-shot</span></span></a>
+  <a href="#fewshot"    aria-label="Few-shot"            style="--sec:var(--wine)"><span class="lab"><span class="ix">04</span><span class="ti">Few-shot</span></span></a>
+  <a href="#how"        aria-label="How it works"        style="--sec:var(--indigo)"><span class="lab"><span class="ix">05</span><span class="ti">How it works</span></span></a>
+  <a href="#resources"  aria-label="Resources"           style="--sec:var(--darkgreen)"><span class="lab"><span class="ix">06</span><span class="ti">Resources</span></span></a>
+  <a href="#cite"       aria-label="Cite"                style="--sec:var(--ink-mute)"><span class="lab"><span class="ix">07</span><span class="ti">Cite</span></span></a>
+</nav>
 
 <!-- ─── HERO ────────────────────────────────────────────────────────── -->
 <header class="hero" id="top">
@@ -160,7 +160,10 @@
 
 <!-- ─── WHAT IT DOES ───────────────────────────────────────────────── -->
 <section class="section" id="what">
-  <span class="section-tag">Two ways to use one model</span>
+  <div class="chapter">
+    <span class="folio" aria-hidden="true">01</span>
+    <span class="section-tag">Two ways to use one model</span>
+  </div>
   <h2>How much do you know about the listener?</h2>
   <p class="lede">
     One fact about the brain sets up everything below: speech-evoked responses are <em>shared across people</em> in auditory cortex, but become <em>increasingly individual</em> in higher-order language regions. That is why a single model can serve two very different situations.
@@ -194,7 +197,10 @@
 
 <!-- ─── RESULT 1 — IT BEHAVES LIKE A BRAIN ────────────────────────── -->
 <section class="section" id="foundation">
-  <span class="section-tag">Result&nbsp;1 · It behaves like a brain</span>
+  <div class="chapter">
+    <span class="folio" aria-hidden="true">02</span>
+    <span class="section-tag">Result&nbsp;1 · It behaves like a brain</span>
+  </div>
   <h2>It organizes like a brain.</h2>
   <p class="lede">
     Before asking how <em>accurately</em> RABBiT predicts, the first question is whether it predicts like a brain at all. It does. Two textbook signatures of the human language network fall straight out of its predictions on held-out data — with no anatomical supervision, and without ever being trained on these contrasts. That is what makes the accuracy in the next two sections worth trusting.
@@ -233,7 +239,10 @@
 
 <!-- ─── RESULT 2 — ZERO-SHOT ──────────────────────────────────────── -->
 <section class="section" id="zeroshot">
-  <span class="section-tag">Result&nbsp;2 · Zero-shot — no data from the person</span>
+  <div class="chapter">
+    <span class="folio" aria-hidden="true">03</span>
+    <span class="section-tag">Result&nbsp;2 · Zero-shot — no data from the person</span>
+  </div>
   <h2>A new person's brain, from speech alone.</h2>
   <p class="lede">
     The hardest case: a participant RABBiT has <strong>never seen</strong>, with <strong>nothing recorded</strong> from them. Audio goes in; their speech-evoked fMRI comes out. Below — first the prediction on one held-out listener, then how it stacks up against the strongest alternatives across all <strong>324</strong>.
@@ -293,7 +302,10 @@
 
 <!-- ─── RESULT 3 — FEW-SHOT ───────────────────────────────────────── -->
 <section class="section" id="fewshot">
-  <span class="section-tag">Result&nbsp;3 · Few-shot — a few minutes of their data</span>
+  <div class="chapter">
+    <span class="folio" aria-hidden="true">04</span>
+    <span class="section-tag">Result&nbsp;3 · Few-shot — a few minutes of their data</span>
+  </div>
   <h2>Ten minutes sharpens the rest.</h2>
   <p class="lede">
     Zero-shot captures what brains <em>share</em>. The parts that make a brain <em>individual</em> — the higher-order language network — need a little of that person's own data. About <strong>~10&nbsp;minutes</strong> of them listening is enough for RABBiT to tune a small per-person adjustment and re-predict.
@@ -365,7 +377,10 @@
 
 <!-- ─── HOW IT WORKS ───────────────────────────────────────────────── -->
 <section class="section" id="how">
-  <span class="section-tag">How it works</span>
+  <div class="chapter">
+    <span class="folio" aria-hidden="true">05</span>
+    <span class="section-tag">How it works</span>
+  </div>
   <h2>Inside the model.</h2>
   <p class="lede">
     Two ideas do the work. One reads the speech stream the way cortex does — region by region. The other separates what everyone shares from what makes a brain individual, which is precisely what lets the same model serve the zero-shot and few-shot regimes above. Then two checks show which components are load-bearing, and why a few minutes of data help exactly where they do.
@@ -457,8 +472,10 @@
 </section>
 
 <!-- ─── RESOURCES ──────────────────────────────────────────────────── -->
-<section class="section" id="resources">
-  <span class="section-tag">Resources</span>
+<section class="section util" id="resources">
+  <div class="chapter">
+    <span class="section-tag">Resources</span>
+  </div>
   <h2>Code, weights, demos.</h2>
   <p class="lede">
     Everything that goes with the paper. The code repo and demo notebook are
@@ -514,8 +531,10 @@
 </section>
 
 <!-- ─── CITE ───────────────────────────────────────────────────────── -->
-<section class="section" id="cite">
-  <span class="section-tag">Cite this paper</span>
+<section class="section util" id="cite">
+  <div class="chapter">
+    <span class="section-tag">Cite this paper</span>
+  </div>
   <h2>BibTeX</h2>
   <p class="lede">If RABBiT is useful for your work, please cite it.</p>
   <pre class="bib">@inproceedings{moussa2026rabbit,
@@ -531,29 +550,55 @@
 
 
 <script>
-  // Sidebar scroll-spy: highlight the TOC entry whose section is currently in view.
-  // Watches every element on the page whose id matches a sidebar link — so the
-  // hero (#top) lights up "Overview" at page start, not just the body sections.
+  // Chapter-rail scroll-spy: light the tick of the section in view, mark the
+  // ticks above it as "done" (filled), default to Overview at load.
   (function () {
-    const links = Array.from(document.querySelectorAll('aside.toc a'));
+    const links = Array.from(document.querySelectorAll('.chapter-rail a'));
     const idToLink = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
     const targets = Array.from(idToLink.keys())
                          .map(id => document.getElementById(id))
                          .filter(Boolean);
     if (!targets.length || !('IntersectionObserver' in window)) return;
-    // Default-highlight the first link until the observer kicks in.
     if (links[0]) links[0].classList.add('active');
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         const link = idToLink.get(e.target.id);
-        if (!link) return;
-        if (e.isIntersecting) {
-          links.forEach(a => a.classList.remove('active'));
-          link.classList.add('active');
-        }
+        if (!link || !e.isIntersecting) return;
+        links.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+        const ai = links.indexOf(link);
+        links.forEach((a, i) => a.classList.toggle('done', i < ai));
       });
     }, { rootMargin: '-25% 0px -55% 0px', threshold: 0 });
     targets.forEach(t => observer.observe(t));
+  })();
+
+  // Smooth progress: fill the active rail tick by how far its section has
+  // scrolled, and drive the phone/tablet top progress bar. Passive + rAF.
+  (function () {
+    const rail = document.querySelector('.chapter-rail');
+    const bar  = document.querySelector('.scroll-progress');
+    const doc  = document.documentElement;
+    let ticking = false;
+    function update() {
+      ticking = false;
+      const max = doc.scrollHeight - doc.clientHeight;
+      if (bar) bar.style.setProperty('--p', (max > 0 ? doc.scrollTop / max : 0).toFixed(4));
+      if (!rail) return;
+      const act = rail.querySelector('a.active');
+      rail.querySelectorAll('a').forEach(a => { if (a !== act) a.style.removeProperty('--seg'); });
+      if (!act) return;
+      const sec = document.getElementById(act.getAttribute('href').slice(1));
+      if (!sec) return;
+      const r = sec.getBoundingClientRect();
+      const vh = window.innerHeight || doc.clientHeight;
+      const seg = Math.min(1, Math.max(0, (vh * 0.5 - r.top) / (r.height || vh)));
+      act.style.setProperty('--seg', seg.toFixed(3));
+    }
+    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll, { passive: true });
+    update();
   })();
 
   // Pause the hero video + show its poster when the user prefers reduced motion
@@ -619,15 +664,19 @@
   var mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
   if (coarse || mobile || conn.saveData) return;                  // skip phones / Data-Saver
   if (typeof navigator.deviceMemory === "number" && navigator.deviceMemory > 0 && navigator.deviceMemory < 8) return;
+  // Keep in sync with demo/app.js — empty until the model is published to a HF repo.
+  var MODEL_HF_REPO = "";
   var onLocalhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-  var url = onLocalhost ? "demo/assets/rabbit_fp32.onnx"
-                        : "https://huggingface.co/omermosa/rabbit/resolve/main/rabbit_fp32.onnx";
+  var url = onLocalhost
+    ? "demo/assets/rabbit_fp32.onnx"
+    : (MODEL_HF_REPO ? "https://huggingface.co/" + MODEL_HF_REPO + "/resolve/main/rabbit_fp32.onnx" : "");
+  if (!url) return;                                               // nothing published yet → nothing to warm
   var warm = function () {
     caches.open("rabbit-model-v1").then(function (cache) {
       cache.match(url).then(function (hit) {
         if (hit) return;                                          // already cached
         fetch(url, { mode: "cors", priority: "low" }).then(function (r) {
-          if (r.ok) cache.put(url, r);                            // streams to disk, no JS heap
+          if (r.ok) cache.put(url, r).catch(function () {});      // ignore cache-write failures
         }).catch(function () {});
       });
     }).catch(function () {});
