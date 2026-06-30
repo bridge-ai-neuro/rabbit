@@ -1,0 +1,47 @@
+[
+  {
+    "id": "clip1",
+    "label": "Friends (TV) · 1",
+    "file": "clip1.f32",
+    "sample_rate": 16000,
+    "n_samples": 384000,
+    "duration_s": 24,
+    "n_tr": 16
+  },
+  {
+    "id": "clip2",
+    "label": "Friends (TV) · 2",
+    "file": "clip2.f32",
+    "sample_rate": 16000,
+    "n_samples": 384000,
+    "duration_s": 24,
+    "n_tr": 16
+  },
+  {
+    "id": "clip3",
+    "label": "Friends (TV) · 3",
+    "file": "clip3.f32",
+    "sample_rate": 16000,
+    "n_samples": 384000,
+    "duration_s": 24,
+    "n_tr": 16
+  },
+  {
+    "id": "clip4",
+    "label": "21st Year (story) · 1",
+    "file": "clip4.f32",
+    "sample_rate": 16000,
+    "n_samples": 384000,
+    "duration_s": 24,
+    "n_tr": 16
+  },
+  {
+    "id": "clip5",
+    "label": "21st Year (story) · 2",
+    "file": "clip5.f32",
+    "sample_rate": 16000,
+    "n_samples": 384000,
+    "duration_s": 24,
+    "n_tr": 16
+  }
+]

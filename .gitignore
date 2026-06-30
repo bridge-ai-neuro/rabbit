@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.venv/
+.tox/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project
+outputs/
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.npz
+!tests/fixtures/*.npz
+
+# Logs
+*.log
+run_logs/
+wandb/
+
+# Cache
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Node / web demo (dev-only; never published)
+node_modules/
+
+# Model weights are served from Hugging Face, never committed
+*.onnx
+
+# GitHub Pages build output
+_site/
+
+# Kept out of the public website repo for now (dev/build-only, large)
+site/assets/hero_build/
+site/demo/node_check/
+site/assets/hero_rabbit.gif

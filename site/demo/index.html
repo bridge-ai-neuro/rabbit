@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RABBiT — live demo · speech → brain</title>
+<meta name="description" content="Live, fully client-side RABBiT demo: play a clip or speak into your mic and watch a held-out listener's predicted language-network fMRI on the cortex — runs entirely in your browser, no server." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="RABBiT — live demo · speech → brain" />
+<meta property="og:description" content="Watch RABBiT predict a held-out listener's speech-evoked fMRI live in your browser." />
+<meta property="og:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
+<style>
+  :root {
+    --ink:#1c1c1a; --ink-soft:#45433d; --muted:#7d7972;
+    --line:#dcdbd6; --line-soft:#ebeae5; --bg:#fdfdfb; --bg-elev:#ffffff;
+    --steel:#6699cc; --wine:#882255;
+    --zero:#4f7fb3; --accent:#a82d4d;
+    --serif:"Iowan Old Style","Charter","Source Serif Pro",Georgia,"Times New Roman",serif;
+  }
+  * { box-sizing: border-box; }
+  html { height:100%; }
+  body { margin:0; min-height:100%; height:100vh; display:flex; flex-direction:column;
+    background:var(--bg); color:var(--ink);
+    font:15px/1.5 "Inter","Helvetica Neue",Helvetica,Arial,sans-serif; }
+
+  /* top bar: lockup left, back + links right (matches the project-page nav) */
+  .topbar { display:flex; align-items:center; gap:14px; padding:9px 20px;
+    background:rgba(253,253,251,.85); backdrop-filter:saturate(180%) blur(8px);
+    border-bottom:1px solid var(--line-soft); position:sticky; top:0; z-index:10; }
+  .topbar .brand { display:inline-flex; align-items:center; }
+  .topbar .brand img { height:24px; display:block; }
+  .topbar .crumb { font-size:12px; text-transform:uppercase; letter-spacing:.14em;
+    color:var(--muted); font-weight:600; }
+  .topbar .spacer { flex:1; }
+  .topbar a { text-decoration:none; }
+  .topbar .back { font-size:13px; font-weight:600; color:var(--wine);
+    padding:5px 12px; border-radius:999px; border:1px solid rgba(136,34,85,.28);
+    transition:background .12s,color .12s; white-space:nowrap; }
+  .topbar .back:hover { background:var(--wine); color:#fff; }
+  .topbar .pill { font-size:12.5px; color:var(--ink-soft); background:var(--bg-elev);
+    border:1px solid var(--line); border-radius:999px; padding:4px 11px; transition:background .12s,color .12s; }
+  .topbar .pill:hover { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+
+  .intro { padding:16px 24px 10px; }
+  .intro h1 { font-family:var(--serif); font-size:22px; margin:0; font-weight:600; letter-spacing:-.01em; }
+  .intro p { margin:5px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:90ch; }
+
+  .wrap { display:grid; grid-template-columns: 1fr 340px; flex:1; min-height:0; }
+  #view { position:relative; }
+  canvas#brain { width:100%; height:100%; display:block; }
+  .panel { border-left:1px solid var(--line); padding:20px; overflow:auto; }
+  .panel h2 { font-size:11.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 10px; font-weight:650; }
+  button, select { font:inherit; padding:9px 12px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer; width:100%; }
+  button { margin-bottom:8px; }
+  button:hover:not(:disabled) { border-color:#cfcdc7; }
+  button:disabled { opacity:.5; cursor:default; }
+  button.primary { background:var(--zero); color:#fff; border-color:var(--zero); }
+  button.mic { background:var(--accent); color:#fff; border-color:var(--accent); }
+  select { margin-bottom:8px; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:14px; }
+  .card.off { opacity:.45; pointer-events:none; }
+  .status { font-size:12.5px; color:var(--muted); margin:4px 0; min-height:18px; font-variant-numeric:tabular-nums; }
+  .bar { height:6px; background:#eee; border-radius:4px; overflow:hidden; margin:6px 0; }
+  .bar > i { display:block; height:100%; width:0; background:var(--zero); transition:width .1s; }
+  .legend { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+  .swatch { height:10px; width:150px; border-radius:3px;
+    background:linear-gradient(90deg,#2f6699,#93aac3,#cdcac3,#ef9255,#c01616); }
+  .roi { font-size:12.5px; color:var(--ink); margin-top:10px; min-height:18px; }
+  .roi b { color:var(--accent); }
+  .note { font-size:11.5px; color:var(--muted); margin-top:6px; line-height:1.4; }
+  .hint { font-size:11.5px; color:var(--muted); margin-top:16px; line-height:1.45; }
+  .panel-back { margin-top:14px; }
+  .panel-back a { color:var(--wine); text-decoration:none; font-weight:600; font-size:12.5px;
+    border-bottom:1px solid rgba(136,34,85,.3); }
+  .panel-back a:hover { border-bottom-color:var(--wine); }
+  code { background:#f1efea; padding:1px 5px; border-radius:4px; font-size:12px; }
+  #caption { position:absolute; left:50%; bottom:22px; transform:translateX(-50%);
+    width:78%; max-height:4.5em; overflow:hidden; text-align:center;
+    background:rgba(24,26,30,.74); color:#fff; padding:10px 18px; border-radius:10px;
+    font-size:15px; line-height:1.5; opacity:0; transition:opacity .25s;
+    pointer-events:none; backdrop-filter:blur(2px);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 40%, #000 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 40%, #000 100%); }
+  #caption.show { opacity:1; }
+  a:focus-visible, button:focus-visible, select:focus-visible {
+    outline:2px solid var(--steel); outline-offset:2px; border-radius:6px; }
+
+  /* Phones: stack the canvas over the panel so the brain keeps a usable size
+     (the desktop "1fr 340px" grid would otherwise squeeze it to a sliver). */
+  @media (max-width: 720px) {
+    body { height:auto; min-height:100vh; }
+    .topbar { gap:8px; padding:8px 12px; flex-wrap:wrap; }
+    .topbar .crumb { display:none; }
+    .intro { padding:12px 16px 6px; }
+    .intro h1 { font-size:19px; }
+    .wrap { grid-template-columns:1fr; }
+    #view { height:56vh; min-height:300px; }
+    .panel { border-left:0; border-top:1px solid var(--line); }
+    #caption { width:90%; font-size:14px; }
+  }
+</style>
+</head>
+<body>
+<nav class="topbar">
+  <a class="brand" href="../" aria-label="RABBiT — overview"><img src="../assets/rabbit-lockup.png" alt="RABBiT"></a>
+  <span class="crumb">Live demo</span>
+  <span class="spacer"></span>
+  <a class="back" href="../">← Overview</a>
+  <a class="pill" href="../#release-status">Paper</a>
+  <a class="pill" href="../#release-status">Code</a>
+</nav>
+<header class="intro">
+  <h1>Speech → brain, live in your browser</h1>
+  <p>A held-out listener's language-network BOLD, predicted from speech by RABBiT — running fully client-side, zero-shot (no data from this person). Pick a clip, or speak into your mic.</p>
+</header>
+
+<div class="wrap">
+  <div id="view"><canvas id="brain" role="img" aria-label="Rotatable 3D cortical surface (both hemispheres) showing RABBiT's predicted brain activation"></canvas><div id="caption" aria-live="polite"></div></div>
+  <div class="panel">
+    <div class="status" id="status" role="status" aria-live="polite">loading…</div>
+    <div class="bar" id="barEl" role="progressbar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="prog"></i></div>
+    <button id="retry" class="primary" hidden>↻ Retry</button>
+
+    <div class="card off" id="clipCard">
+      <h2>Play a clip</h2>
+      <select id="clipSel" aria-label="Choose a demo clip"></select>
+      <button id="run" class="primary" aria-label="Play the selected clip">▶ Play</button>
+    </div>
+
+    <div class="card off" id="micCard">
+      <h2>Use your microphone (live)</h2>
+      <button id="mic" class="mic" aria-pressed="false">● Start microphone</button>
+      <div class="note" id="micNote"><strong>Experimental · desktop only.</strong> First use
+        downloads the ~420 MB model (cached after — one-time) and runs it on your CPU in a
+        background worker, so the brain refreshes every few seconds — speak continuously.</div>
+    </div>
+
+    <h2 style="margin-top:18px">Predicted activation</h2>
+    <div class="legend"><span>deact.</span><span class="swatch"></span><span>act.</span></div>
+
+    <p class="hint">Drag to rotate · scroll to zoom. Two halves = left/right
+      hemispheres (pial fsaverage6). Only the 30 language-network ROIs are
+      coloured. Mic needs <code>http://localhost</code> or HTTPS.</p>
+
+    <p class="panel-back"><a href="../">← Back to the RABBiT overview</a></p>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
