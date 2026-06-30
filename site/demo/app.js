@@ -12,7 +12,7 @@ const NEUTRAL = [0xcd / 255, 0xca / 255, 0xc3 / 255];
 
 // The mic-mode weight lives on Hugging Face (too big for Pages) and is cached on
 // the device after the first download. Set this to enable mic mode.
-const MODEL_HF_REPO = "";   // e.g. "org/name" — leave empty to keep mic mode off
+const MODEL_HF_REPO = "omermosa/rabbit";   // public HF repo holding rabbit_fp32.onnx
 const MODEL_URLS = MODEL_HF_REPO ? [`https://huggingface.co/${MODEL_HF_REPO}/resolve/main/rabbit_fp32.onnx`] : [];
 const MODEL_CACHE = "rabbit-model-v1";   // bump to invalidate the cached weight
 

@@ -773,7 +773,7 @@ figure.fig.bordered img { border: 1px solid var(--line-soft); }
   font-size: 1.02rem;
   line-height: 1.62;
   color: var(--ink-soft);
-  max-width: 46ch;
+  max-width: 52ch;
   margin: 0.45rem 0;
   text-wrap: pretty;
 }
@@ -1036,7 +1036,7 @@ svg.icon { width: 1em; height: 1em; vertical-align: -0.15em; }
    left-weighting, no dead right band. Content width grows with the viewport. */
 @media (min-width: 1320px) {
   :root {
-    --content: clamp(900px, calc(100vw - 360px), 1160px);
+    --content: clamp(900px, calc(100vw - 360px), 1600px);
     --railzone: 284px;   /* rail (232) + gap */
   }
   .hero .container,
