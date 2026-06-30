@@ -30,8 +30,8 @@ const asI32 = (b) => new Int32Array(b.buffer, b.byteOffset, b.byteLength / 4);
 
 const S = { rm: null, params: null, clips: null, flatToFs6: null, baseColor: null, colorAttr: null,
   preds: null, nPred: 0, clip: null, playing: false, IN: 0, curClip: null, transcripts: null,
-  worker: null, ep: "", pending: null, reqId: 0, mic: null, modelWarm: null,
-  whisper: null, whisperEp: "", whisperPending: null, whisperReq: 0 };
+  worker: null, ep: "", pending: null, reqId: 0, mic: null, modelWarm: null, clipCtx: null,
+  whisper: null, whisperInit: null, whisperEp: "", whisperPending: null, whisperReq: 0 };
 
 function hasWebGL() {
   try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); }
@@ -73,7 +73,7 @@ function buildScene(coords, faces) {
   scene.add(new THREE.HemisphereLight(0xffffff, 0x4a525e, 0.75));
   const key = new THREE.DirectionalLight(0xffffff, 0.7); key.position.set(0.4, -1, 0.9); scene.add(key);
   const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(-0.6, 0.4, 0.3); scene.add(fill);
-  const cam = new THREE.PerspectiveCamera(38, 1, R * 0.05, R * 20); cam.up.set(0, 0, 1); cam.position.set(0, -R * 2.7, R * 0.55);
+  const cam = new THREE.PerspectiveCamera(38, 1, R * 0.05, R * 20); cam.up.set(0, 0, 1); cam.position.set(-R * 2.9, 0, R * 0.08);
   const controls = new OrbitControls(cam, renderer.domElement); controls.enableDamping = true;
   function resize() { const w = canvas.clientWidth, h = canvas.clientHeight; if (w && h && (canvas.width !== w || canvas.height !== h)) { renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); } }
   (function loop() { resize(); controls.update(); renderer.render(scene, cam); requestAnimationFrame(loop); })();
@@ -177,7 +177,13 @@ async function run() {
 }
 function playAudioAnimate() {
   const p = S.params, dur = S.clip.length / p.sample_rate, OUT = S.rm.flat_dim;
-  try { const ctx = new (window.AudioContext || window.webkitAudioContext)(); ctx.resume(); const b = ctx.createBuffer(1, S.clip.length, p.sample_rate); b.copyToChannel(S.clip, 0); const src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start(); } catch (e) { console.warn("audio:", e.message); }
+  try {
+    if (S.clipCtx) { S.clipCtx.close().catch(() => {}); S.clipCtx = null; }   // close the previous clip's context
+    const ctx = new (window.AudioContext || window.webkitAudioContext)(); S.clipCtx = ctx;
+    const b = ctx.createBuffer(1, S.clip.length, p.sample_rate); b.copyToChannel(S.clip, 0);
+    const src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination);
+    ctx.resume().then(() => src.start()).catch(() => { try { src.start(); } catch {} });   // start once running
+  } catch (e) { console.warn("audio:", e.message); }
   const segs = (S.transcripts && S.curClip) ? (S.transcripts[S.curClip.id] || []) : [];
   S.capWords = []; let segIdx = 0;
   const t0 = performance.now(); S.playing = true;
@@ -249,7 +255,9 @@ function micProg(got, total) { setMicStatus(total ? `loading model… ${(got / 1
 // Warm the model into the cache in the background so the mic is ready before
 // it's clicked. De-duped: the click path awaits this same download.
 function warmModel() {
-  if (S.worker || S.modelWarm) return S.modelWarm;
+  // Prefetch only when Cache Storage exists to hold it; otherwise the bytes would
+  // be discarded here and re-downloaded on click. No cache → fetch on demand.
+  if (S.worker || S.modelWarm || !("caches" in window)) return S.modelWarm;
   setMicStatus("preparing live mic…", true);
   S.modelWarm = getModelBytes(micProg)
     .then(() => { setMicStatus("live mic ready", false); })
@@ -273,33 +281,64 @@ async function ensureWorker() {
 }
 function workerRun(data) {
   const id = ++S.reqId;
-  return new Promise((resolve, reject) => { S.pending.set(id, { resolve, reject }); S.worker.postMessage({ type: "run", id, data, rows: 1, cols: S.IN }, [data.buffer]); });
+  return new Promise((resolve, reject) => {
+    const to = setTimeout(() => { if (S.pending.delete(id)) reject(new Error("inference timeout")); }, 30000);
+    const wrap = (fn) => (v) => { clearTimeout(to); fn(v); };
+    S.pending.set(id, { resolve: wrap(resolve), reject: wrap(reject) });
+    S.worker.postMessage({ type: "run", id, data, rows: 1, cols: S.IN }, [data.buffer]);
+  });
 }
 
 // Live captions in a separate worker (display only — not fed to the model).
-async function ensureWhisper() {
-  if (S.whisper) return;
-  const w = new Worker("./whisper_worker.mjs", { type: "module" });
-  await new Promise((resolve, reject) => {
-    w.onmessage = (e) => { if (e.data.type === "ready") { S.whisperEp = e.data.ep; resolve(); } else if (e.data.type === "error") reject(new Error(e.data.error)); };
-    w.postMessage({ type: "init" });
-  });
-  S.whisperPending = new Map(); S.whisperReq = 0;
-  w.onmessage = (e) => { const m = e.data; const p = S.whisperPending.get(m.id); if (!p) return; S.whisperPending.delete(m.id); m.type === "text" ? p.resolve(m.text) : p.reject(new Error(m.error)); };
-  S.whisper = w;
+// Single-flight: repeat/concurrent callers await the same init.
+function ensureWhisper() {
+  if (S.whisperInit) return S.whisperInit;
+  S.whisperInit = (async () => {
+    const w = new Worker("./whisper_worker.mjs", { type: "module" });
+    S.whisperPending = new Map(); S.whisperReq = 0;
+    try {
+      await new Promise((resolve, reject) => {
+        w.onmessage = (e) => { if (e.data.type === "ready") { S.whisperEp = e.data.ep; resolve(); } else if (e.data.type === "error") reject(new Error(e.data.error)); };
+        w.postMessage({ type: "init" });
+      });
+    } catch (e) { w.terminate(); S.whisperInit = null; throw e; }   // don't leak a half-built worker
+    // Steady state: route replies by id; a null-id error = a fatal worker crash.
+    w.onmessage = (e) => {
+      const m = e.data;
+      if (m.type === "error" && m.id == null) { for (const p of S.whisperPending.values()) p.reject(new Error(m.error || "whisper error")); S.whisperPending.clear(); return; }
+      const p = S.whisperPending.get(m.id); if (!p) return; S.whisperPending.delete(m.id);
+      m.type === "text" ? p.resolve(m.text) : p.reject(new Error(m.error));
+    };
+    w.onerror = () => { for (const p of S.whisperPending.values()) p.reject(new Error("whisper worker error")); S.whisperPending.clear(); };
+    S.whisper = w;
+  })();
+  return S.whisperInit;
 }
 function whisperRun(audio) {
   const id = ++S.whisperReq;
-  return new Promise((resolve, reject) => { S.whisperPending.set(id, { resolve, reject }); S.whisper.postMessage({ type: "transcribe", id, audio }, [audio.buffer]); });
+  return new Promise((resolve, reject) => {
+    const to = setTimeout(() => {
+      if (S.whisperPending.delete(id)) {
+        try { S.whisper && S.whisper.terminate(); } catch {}
+        S.whisper = null; S.whisperInit = null;       // recycle a wedged worker; captionTick rebuilds it
+        reject(new Error("whisper timeout"));
+      }
+    }, window.__whisperTimeoutMs || 15000);
+    const wrap = (fn) => (v) => { clearTimeout(to); fn(v); };
+    S.whisperPending.set(id, { resolve: wrap(resolve), reject: wrap(reject) });
+    S.whisper.postMessage({ type: "transcribe", id, audio }, [audio.buffer]);
+  });
 }
 async function captionTick() {
-  const m = S.mic; if (!m || m.capBusy || !S.whisper || !m.ring || m.ring.length < 8000) return;
+  const m = S.mic; if (!m || m.capBusy || !m.ring || m.ring.length < 8000) return;
+  if (!S.whisper) { ensureWhisper().catch(() => {}); return; }      // (re)build if missing/recycled
+  const recent = m.ring.slice(Math.max(0, m.ring.length - Math.round(1.5 * 16000)));
+  if (audioRms(recent) < 0.0025) return;     // near-silence over the last ~1.5s → don't ask Whisper
   const win = m.ring.slice(Math.max(0, m.ring.length - 5 * 16000));
-  if (audioRms(win) < 0.008) return;        // near-silence: don't ask Whisper (it hallucinates)
   m.capBusy = true;
-  try { const text = await whisperRun(win); if (S.mic && !captionLooksBad(text)) pushCaption(text); }
+  try { const text = await whisperRun(win); if (S.mic === m && !captionLooksBad(text)) pushCaption(text); }
   catch (e) { console.warn("whisper:", e.message); }
-  finally { if (S.mic) m.capBusy = false; }
+  finally { m.capBusy = false; }            // always release so a hiccup can't freeze captions
 }
 
 // ── Microphone ──
@@ -314,16 +353,23 @@ async function startMic() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
     const srcNode = ctx.createMediaStreamSource(stream);
     const proc = ctx.createScriptProcessor(4096, 1, 1);
-    const KEEP = S.IN + 16000; let ring = new Float32Array(0);
-    proc.onaudioprocess = (e) => { const ch = e.inputBuffer.getChannelData(0); const m = new Float32Array(ring.length + ch.length); m.set(ring); m.set(ch, ring.length); ring = m.length > KEEP ? m.slice(m.length - KEEP) : m; S.mic.ring = ring; };
+    const KEEP = S.IN + 16000;
+    const mic = { ctx, stream, proc, srcNode, ring: new Float32Array(0), busy: false };
+    proc.onaudioprocess = (e) => {
+      if (S.mic !== mic) return;               // ignore audio from a torn-down session
+      const ch = e.inputBuffer.getChannelData(0);
+      const merged = new Float32Array(mic.ring.length + ch.length);
+      merged.set(mic.ring); merged.set(ch, mic.ring.length);
+      mic.ring = merged.length > KEEP ? merged.slice(merged.length - KEEP) : merged;
+    };
     srcNode.connect(proc); proc.connect(ctx.destination);
-    S.mic = { ctx, stream, proc, srcNode, ring, busy: false };
+    S.mic = mic;
     $("mic").textContent = "■ Stop microphone"; $("mic").style.background = "#555"; $("mic").disabled = false;
     $("mic").setAttribute("aria-pressed", "true");
     setStatus("listening — running on CPU, the brain refreshes every few seconds; speak continuously.");
-    S.mic.timer = setInterval(predictNow, 500);
+    mic.timer = setInterval(predictNow, 500);
     // captions run in their own worker so they don't compete with inference
-    ensureWhisper().then(() => { if (S.mic) S.mic.capTimer = setInterval(captionTick, 1200); })
+    ensureWhisper().then(() => { if (S.mic === mic && !mic.capTimer) mic.capTimer = setInterval(captionTick, 1200); })
       .catch((e) => console.warn("whisper init:", e.message));
   } catch (e) {
     console.error(e);
@@ -340,10 +386,10 @@ async function predictNow() {
   m.busy = true;
   try {
     const out = await workerRun(m.ring.slice(m.ring.length - S.IN));
-    if (!S.mic) return;                        // stopped mid-inference -> don't repaint
+    if (S.mic !== m) return;                    // stopped/restarted mid-inference -> don't repaint
     paintFrame(out);
   } catch (e) { console.error(e); }
-  finally { if (S.mic) S.mic.busy = false; }
+  finally { m.busy = false; }
 }
 function stopMic() {
   const m = S.mic; if (!m) return;

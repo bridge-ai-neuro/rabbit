@@ -33,16 +33,22 @@
     <a class="brand" href="#top" aria-label="RABBiT — home">
       <img loading="eager" decoding="async" width="920" height="280" class="brand-lockup" src="assets/rabbit-lockup.png" alt="RABBiT">
     </a>
-    <a class="section-link" href="#what">Two ways to use it</a>
-    <a class="section-link" href="#foundation">A language network</a>
-    <a class="section-link" href="#zeroshot">Zero-shot</a>
-    <a class="section-link" href="#fewshot">Few-shot</a>
-    <a class="section-link" href="#how">How it works</a>
-    <a class="section-link" href="#cite">Cite</a>
+    <div class="nav-links" id="nav-sections">
+      <a class="section-link" href="#what">Two ways to use it</a>
+      <a class="section-link" href="#foundation">A language network</a>
+      <a class="section-link" href="#zeroshot">Zero-shot</a>
+      <a class="section-link" href="#fewshot">Few-shot</a>
+      <a class="section-link" href="#how">How it works</a>
+      <a class="section-link" href="#cite">Cite</a>
+      <a class="section-link menu-only" href="#release-status">Paper</a>
+      <a class="section-link menu-only" href="#release-status">Code</a>
+    </div>
     <span class="right">
       <a class="nav-cta" href="demo/"><span aria-hidden="true">🧠</span>&nbsp;Live demo</a>
       <a class="pill-link" href="#release-status">Paper</a>
       <a class="pill-link" href="#release-status">Code</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open section navigation"
+              aria-expanded="false" aria-controls="nav-sections"><span class="bars" aria-hidden="true"></span></button>
     </span>
   </div>
 </nav>
@@ -561,6 +567,25 @@
     const apply = () => { if (mq.matches || saveData) hold(); };
     apply();
     mq.addEventListener && mq.addEventListener('change', apply);
+  })();
+
+  // Mobile section nav: the hamburger toggles the collapsed link menu.
+  // Closes on link tap, outside click, or Escape.
+  (function () {
+    const btn = document.getElementById('navToggle');
+    const menu = document.getElementById('nav-sections');
+    if (!btn || !menu) return;
+    const close = () => { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', String(isOpen));
+    });
+    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+    document.addEventListener('click', (e) => {
+      if (menu.classList.contains('open') && !menu.contains(e.target) && e.target !== btn) close();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   })();
 </script>
 

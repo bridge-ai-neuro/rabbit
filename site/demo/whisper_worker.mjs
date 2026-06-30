@@ -7,6 +7,11 @@ import { pipeline, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transfo
 env.allowLocalModels = false;          // always fetch from the HF hub
 let asr = null, ep = "";
 
+// If the worker dies outside the request handler (module load, OOM, uncaught
+// async), still notify the main thread (id:null = fatal) instead of going silent.
+self.onerror = (msg) => { try { self.postMessage({ type: "error", id: null, error: String(msg) }); } catch {} };
+self.addEventListener("unhandledrejection", (ev) => { try { self.postMessage({ type: "error", id: null, error: String((ev.reason && ev.reason.message) || ev.reason) }); } catch {} });
+
 // whisper-tiny: small and fast, for snappy captions.
 const build = (device) => pipeline("automatic-speech-recognition", "onnx-community/whisper-tiny", { device });
 

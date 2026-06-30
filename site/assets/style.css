@@ -128,12 +128,49 @@ nav.top a.section-link {
   font-size: 0.9rem;
 }
 nav.top a.section-link:hover { background: var(--bg-soft); color: var(--ink); }
-/* Hide the in-nav section links when they'd crowd; brand + pills remain. */
-@media (max-width: 1024px) { nav.top a.section-link { display: none; } }
-/* Tighten nav spacing just before the links drop, so six links never wrap. */
+/* Section links sit in a row on desktop; below 1024 they collapse into a
+   hamburger dropdown so section navigation is never lost on small screens. */
+.nav-links { display: flex; align-items: center; gap: 0.2rem; }
+.menu-only { display: none; }   /* Paper/Code — only shown inside the mobile menu */
+
+.nav-toggle {
+  display: none; width: 38px; height: 34px; padding: 0; cursor: pointer;
+  align-items: center; justify-content: center; background: var(--bg-elev);
+  border: 1px solid var(--line); border-radius: 8px;
+}
+.nav-toggle:hover { background: var(--bg-soft); border-color: #cfcdc7; }
+.nav-toggle .bars, .nav-toggle .bars::before, .nav-toggle .bars::after {
+  content: ""; display: block; width: 18px; height: 2px; border-radius: 2px;
+  background: var(--ink); transition: transform .18s, opacity .18s;
+}
+.nav-toggle .bars { position: relative; }
+.nav-toggle .bars::before { position: absolute; top: -6px; left: 0; }
+.nav-toggle .bars::after  { position: absolute; top: 6px;  left: 0; }
+.nav-toggle[aria-expanded="true"] .bars { background: transparent; }
+.nav-toggle[aria-expanded="true"] .bars::before { transform: translateY(6px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .bars::after  { transform: translateY(-6px) rotate(-45deg); }
+
+/* Tighten nav spacing just before the links collapse, so six links never wrap. */
 @media (max-width: 1180px) {
   nav.top .inner { gap: 0.7rem; }
   nav.top a.section-link { padding: 0.2rem 0.4rem; }
+}
+
+@media (max-width: 1024px) {
+  .nav-toggle { display: inline-flex; }
+  nav.top .right .pill-link { display: none; }   /* Paper/Code move into the menu */
+  .nav-links {
+    position: absolute; top: 100%; left: 0; right: 0;
+    flex-direction: column; align-items: stretch; gap: 0;
+    background: var(--bg-elev); border-bottom: 1px solid var(--line);
+    box-shadow: var(--shadow-soft); padding: 0.3rem 0; display: none;
+  }
+  .nav-links.open { display: flex; }
+  .menu-only { display: block; }
+  nav.top a.section-link {
+    display: block; padding: 0.7rem 1.6rem; border-radius: 0; font-size: 0.98rem;
+  }
+  nav.top a.section-link:hover { background: var(--bg-soft); }
 }
 nav.top .right { margin-left: auto; display: flex; gap: 0.4rem; align-items: center; }
 nav.top .pill-link {
