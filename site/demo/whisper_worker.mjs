@@ -23,7 +23,7 @@ self.onmessage = async (e) => {
       if (!asr) throw new Error(last || "no backend");
       self.postMessage({ type: "ready", ep });
     } else if (m.type === "transcribe") {
-      const r = await asr(m.audio, { chunk_length_s: 30, return_timestamps: false });
+      const r = await asr(m.audio, { chunk_length_s: 30, return_timestamps: false, language: "english", task: "transcribe" });
       self.postMessage({ type: "text", id: m.id, text: (r.text || "").trim() });
     }
   } catch (err) { self.postMessage({ type: "error", id: m.id, error: err.message }); }

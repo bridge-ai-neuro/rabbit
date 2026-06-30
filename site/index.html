@@ -271,7 +271,7 @@
     </div>
   </div>
 
-  <div class="figrow">
+  <div class="figrow figfull">
     <figure class="figmedia">
       <img loading="lazy" decoding="async" width="1600" height="554" src="assets/dots_lang_paper_horiz.png" alt="Group-level prediction across language ROIs vs the inter-subject-consistency ceiling: RABBiT reaches the ceiling on Narratives and surpasses it on Le Petit Prince, above TRIBEv2 and a linear baseline">
       <figcaption class="figcap"><span class="num">Fig 6</span>$r_\text{group}$ across bilateral language ROIs · Narratives &amp; Le&nbsp;Petit&nbsp;Prince.</figcaption>
@@ -406,7 +406,7 @@
     $\Phi_i$ is the shared basis (the population response subspace for region $i$); $\Delta_{i,s}$ is the per-person deviation basis (the only part updated during few-shot); $\pi_i, \rho_i$ are small heads that read out from the region representation $z_i$.
   </p>
 
-  <div class="figrow">
+  <div class="figrow figfull">
     <figure class="figmedia bordered">
       <img loading="lazy" decoding="async" width="2700" height="833" src="assets/training-process.png" alt="RABBiT pipeline: audio → speech backbone → TBT → SID → predicted fMRI">
       <figcaption class="figcap"><span class="num">Fig 13</span>audio → speech backbone → TBT → SID → predicted fMRI.</figcaption>
@@ -582,6 +582,35 @@
     </div>
   </div>
 </footer>
+
+<!-- Warm the live-demo model into Cache Storage in the background, so the mic is
+     ready by the time a visitor reaches the demo. Same cache + URL as demo/app.js
+     (keep in sync). Desktop + good-network only, low priority, after the page settles. -->
+<script>
+(function () {
+  if (!window.isSecureContext || !("caches" in window)) return;
+  var conn = navigator.connection || {};
+  var coarse = window.matchMedia && matchMedia("(pointer: coarse)").matches;
+  var mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+  if (coarse || mobile || conn.saveData) return;                  // skip phones / Data-Saver
+  if (typeof navigator.deviceMemory === "number" && navigator.deviceMemory > 0 && navigator.deviceMemory < 8) return;
+  var onLocalhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  var url = onLocalhost ? "demo/assets/rabbit_fp32.onnx"
+                        : "https://huggingface.co/omermosa/rabbit/resolve/main/rabbit_fp32.onnx";
+  var warm = function () {
+    caches.open("rabbit-model-v1").then(function (cache) {
+      cache.match(url).then(function (hit) {
+        if (hit) return;                                          // already cached
+        fetch(url, { mode: "cors", priority: "low" }).then(function (r) {
+          if (r.ok) cache.put(url, r);                            // streams to disk, no JS heap
+        }).catch(function () {});
+      });
+    }).catch(function () {});
+  };
+  if ("requestIdleCallback" in window) requestIdleCallback(warm, { timeout: 5000 });
+  else setTimeout(warm, 2500);
+})();
+</script>
 
 </body>
 </html>

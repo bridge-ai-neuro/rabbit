@@ -13,7 +13,12 @@ const NEUTRAL = [0xcd / 255, 0xca / 255, 0xc3 / 255];
 // The mic-mode weight lives on Hugging Face (too big for Pages) and is cached on
 // the device after the first download. Set this to enable mic mode.
 const MODEL_HF_REPO = "omermosa/rabbit";   // public HF repo holding rabbit_fp32.onnx
-const MODEL_URLS = MODEL_HF_REPO ? [`https://huggingface.co/${MODEL_HF_REPO}/resolve/main/rabbit_fp32.onnx`] : [];
+const HF_MODEL = MODEL_HF_REPO ? `https://huggingface.co/${MODEL_HF_REPO}/resolve/main/rabbit_fp32.onnx` : null;
+const LOCAL_MODEL = "assets/rabbit_fp32.onnx";   // dev: served from the symlink by serve.mjs
+// On localhost use the local file (no download); on the live site use HF and let
+// the local path fall through (it just 404s there).
+const onLocalhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+const MODEL_URLS = (onLocalhost ? [LOCAL_MODEL, HF_MODEL] : [HF_MODEL, LOCAL_MODEL]).filter(Boolean);
 const MODEL_CACHE = "rabbit-model-v1";   // bump to invalidate the cached weight
 
 const $ = (id) => document.getElementById(id);
@@ -25,7 +30,7 @@ const asI32 = (b) => new Int32Array(b.buffer, b.byteOffset, b.byteLength / 4);
 
 const S = { rm: null, params: null, clips: null, flatToFs6: null, baseColor: null, colorAttr: null,
   preds: null, nPred: 0, clip: null, playing: false, IN: 0, curClip: null, transcripts: null,
-  worker: null, ep: "", pending: null, reqId: 0, mic: null,
+  worker: null, ep: "", pending: null, reqId: 0, mic: null, modelWarm: null,
   whisper: null, whisperEp: "", whisperPending: null, whisperReq: 0 };
 
 function hasWebGL() {
@@ -97,6 +102,17 @@ function pushCaption(text) {
 }
 function clearCaption() { S.capWords = []; const el = $("caption"); el.textContent = ""; el.classList.remove("show"); }
 
+// Whisper invents text on silence/noise. Skip near-silent windows, and drop the
+// stock hallucinations and single-word loops it still produces.
+function audioRms(a) { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * a[i]; return Math.sqrt(s / (a.length || 1)); }
+const CAPTION_JUNK = /^(you|thank you[.!]?|thanks for watching[.!]?|please subscribe[.!]?|bye[.!]?|\.|♪.*|\[.*\]|\(.*\))$/i;
+function captionLooksBad(t) {
+  const s = (t || "").trim();
+  if (s.length < 2 || CAPTION_JUNK.test(s)) return true;
+  const w = s.toLowerCase().replace(/[.,!?]/g, "").split(/\s+/).filter(Boolean);
+  return w.length >= 4 && new Set(w).size <= 2;   // e.g. "the the the the"
+}
+
 // ── Startup ──
 function showNoWebGL() {
   const v = $("view");
@@ -106,7 +122,12 @@ function showNoWebGL() {
 }
 function gateMic() {
   const ms = micSupport();
-  if (ms.ok) { $("micCard").classList.remove("off"); $("mic").disabled = false; return; }
+  if (ms.ok) {
+    $("micCard").classList.remove("off"); $("mic").disabled = false;
+    const saveData = navigator.connection && navigator.connection.saveData;
+    if (MODEL_URLS.length && !saveData) warmModel();   // prefetch so the mic is ready when clicked
+    return;
+  }
   $("micCard").classList.add("off"); $("mic").disabled = true;
   $("mic").textContent = "● Live mic — desktop only";
   const note = $("micNote");
@@ -175,14 +196,15 @@ function playAudioAnimate() {
 
 // ── Live mic inference (in a worker) ──
 
-// Download the weight, aborting if the connection stalls for 25 s.
-async function streamModel(url) {
+// Download the weight at low priority (so it doesn't crowd the clip/page
+// fetches), aborting if the connection stalls for 25 s. onProgress(got, total).
+async function streamModel(url, onProgress) {
   const ctrl = new AbortController();
   let stallId;
-  const arm = () => { clearTimeout(stallId); stallId = setTimeout(() => ctrl.abort(), 25000); };  // abort after 25s with no new bytes
+  const arm = () => { clearTimeout(stallId); stallId = setTimeout(() => ctrl.abort(), 25000); };
   arm();
   let resp;
-  try { resp = await fetch(url, { signal: ctrl.signal, mode: "cors" }); }
+  try { resp = await fetch(url, { signal: ctrl.signal, mode: "cors", priority: "low" }); }
   catch (e) { clearTimeout(stallId); throw e; }
   if (!resp.ok) { clearTimeout(stallId); throw new Error(`model HTTP ${resp.status}`); }
   const total = +(resp.headers.get("content-length") || 0);
@@ -191,8 +213,7 @@ async function streamModel(url) {
     for (;;) {
       const { done, value } = await reader.read(); if (done) break;
       chunks.push(value); got += value.length; arm();
-      if (total) { setProg(got / total); setStatus(`downloading model… ${(got / 1e6) | 0}/${(total / 1e6) | 0} MB`); }
-      else setStatus(`downloading model… ${(got / 1e6) | 0} MB`);
+      onProgress && onProgress(got, total);
     }
   } finally { clearTimeout(stallId); }
   const buf = new Uint8Array(got); let o = 0; for (const c of chunks) { buf.set(c, o); o += c.length; } chunks.length = 0;
@@ -200,30 +221,47 @@ async function streamModel(url) {
 }
 // Return the cached weight if we have it, else download it (one retry) and cache
 // it so the device never refetches 422 MB.
-async function getModelBytes() {
+async function getModelBytes(onProgress) {
   let cache = null;
   try { cache = await caches.open(MODEL_CACHE); } catch {}
   if (cache) {
     for (const u of MODEL_URLS) {
-      try { const hit = await cache.match(u); if (hit && hit.ok) { setStatus("model ready (cached) — initialising…"); setProg(1); return new Uint8Array(await hit.arrayBuffer()); } } catch {}
+      try { const hit = await cache.match(u); if (hit && hit.ok) return new Uint8Array(await hit.arrayBuffer()); } catch {}
     }
   }
   let lastErr;
   for (const u of MODEL_URLS) {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const buf = await streamModel(u);
+        const buf = await streamModel(u, onProgress);
         if (cache) { try { await cache.put(u, new Response(buf, { headers: { "content-type": "application/octet-stream" } })); } catch (e) { console.warn("model cache put:", e.message); } }
         return buf;
-      } catch (e) { lastErr = e; if (e.name === "AbortError") setStatus("download stalled — retrying…"); else console.warn("model fetch:", e.message); }
+      } catch (e) { lastErr = e; if (e.name !== "AbortError") console.warn("model fetch:", e.message); }
     }
   }
   throw new Error(`couldn’t load the model (it may still be deploying). ${lastErr ? lastErr.message : ""}`.trim());
 }
+
+// Show model-download progress on the mic card (not the clip status line).
+function setMicStatus(text, busy) { const el = $("micStatus"); if (!el) return; el.textContent = text || ""; el.classList.toggle("busy", !!busy); }
+function micProg(got, total) { setMicStatus(total ? `loading model… ${(got / 1e6) | 0}/${(total / 1e6) | 0} MB` : `loading model… ${(got / 1e6) | 0} MB`, true); }
+
+// Warm the model into the cache in the background so the mic is ready before
+// it's clicked. De-duped: the click path awaits this same download.
+function warmModel() {
+  if (S.worker || S.modelWarm) return S.modelWarm;
+  setMicStatus("preparing live mic…", true);
+  S.modelWarm = getModelBytes(micProg)
+    .then(() => { setMicStatus("live mic ready", false); })
+    .catch((e) => { S.modelWarm = null; setMicStatus(""); console.warn("prefetch:", e.message); });
+  return S.modelWarm;
+}
 async function ensureWorker() {
   if (S.worker) return;
   const w = new Worker("./rabbit_worker.mjs", { type: "module" });
-  const buf = await getModelBytes();
+  if (S.modelWarm) { try { await S.modelWarm; } catch {} }   // reuse the background prefetch
+  const buf = await getModelBytes(micProg);                  // cache hit if prefetched → instant
+  setMicStatus("", false);
   setStatus("initialising model in worker…");
   await new Promise((resolve, reject) => {
     w.onmessage = (e) => { if (e.data.type === "ready") { S.ep = e.data.ep; resolve(); } else if (e.data.type === "error") reject(new Error(e.data.error)); };
@@ -231,7 +269,7 @@ async function ensureWorker() {
   });
   S.pending = new Map(); S.reqId = 0;
   w.onmessage = (e) => { const m = e.data; const p = S.pending.get(m.id); if (!p) return; S.pending.delete(m.id); m.type === "result" ? p.resolve(m.preds) : p.reject(new Error(m.error)); };
-  S.worker = w; setProg(1);
+  S.worker = w;
 }
 function workerRun(data) {
   const id = ++S.reqId;
@@ -256,8 +294,10 @@ function whisperRun(audio) {
 }
 async function captionTick() {
   const m = S.mic; if (!m || m.capBusy || !S.whisper || !m.ring || m.ring.length < 8000) return;
+  const win = m.ring.slice(Math.max(0, m.ring.length - 5 * 16000));
+  if (audioRms(win) < 0.008) return;        // near-silence: don't ask Whisper (it hallucinates)
   m.capBusy = true;
-  try { const text = await whisperRun(m.ring.slice(Math.max(0, m.ring.length - 5 * 16000))); if (S.mic && text) pushCaption(text); }
+  try { const text = await whisperRun(win); if (S.mic && !captionLooksBad(text)) pushCaption(text); }
   catch (e) { console.warn("whisper:", e.message); }
   finally { if (S.mic) m.capBusy = false; }
 }
@@ -266,6 +306,7 @@ async function captionTick() {
 async function startMic() {
   if (S.mic) return stopMic();
   $("mic").disabled = true; clearCaption();
+  setStatus("loading the model — one moment…");
   try {
     await ensureWorker();
     const ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });

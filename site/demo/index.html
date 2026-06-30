@@ -23,7 +23,7 @@
   html { height:100%; }
   body { margin:0; min-height:100%; height:100vh; display:flex; flex-direction:column;
     background:var(--bg); color:var(--ink);
-    font:15px/1.5 "Inter","Helvetica Neue",Helvetica,Arial,sans-serif; }
+    font:clamp(14px, 13.4px + 0.16vw, 16px)/1.5 "Inter","Helvetica Neue",Helvetica,Arial,sans-serif; }
 
   /* top bar: lockup left, back + links right (matches the project-page nav) */
   .topbar { display:flex; align-items:center; gap:14px; padding:9px 20px;
@@ -44,10 +44,10 @@
   .topbar .pill:hover { background:var(--ink); color:var(--bg); border-color:var(--ink); }
 
   .intro { padding:16px 24px 10px; }
-  .intro h1 { font-family:var(--serif); font-size:22px; margin:0; font-weight:600; letter-spacing:-.01em; }
+  .intro h1 { font-family:var(--serif); font-size:clamp(20px, 18px + 0.4vw, 26px); margin:0; font-weight:600; letter-spacing:-.01em; }
   .intro p { margin:5px 0 0; color:var(--ink-soft); font-size:13.5px; max-width:90ch; }
 
-  .wrap { display:grid; grid-template-columns: 1fr 340px; flex:1; min-height:0; }
+  .wrap { display:grid; grid-template-columns: minmax(0,1fr) clamp(320px, 22vw, 420px); flex:1; min-height:0; }
   #view { position:relative; }
   canvas#brain { width:100%; height:100%; display:block; }
   .panel { border-left:1px solid var(--line); padding:20px; overflow:auto; }
@@ -70,6 +70,10 @@
   .roi { font-size:12.5px; color:var(--ink); margin-top:10px; min-height:18px; }
   .roi b { color:var(--accent); }
   .note { font-size:11.5px; color:var(--muted); margin-top:6px; line-height:1.4; }
+  .micstat { font-size:11.5px; color:var(--ink-soft); margin:4px 0 2px; min-height:15px; display:flex; align-items:center; gap:7px; }
+  .micstat.busy::before { content:""; width:11px; height:11px; flex:none; border:2px solid var(--line);
+    border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
   .hint { font-size:11.5px; color:var(--muted); margin-top:16px; line-height:1.45; }
   .panel-back { margin-top:14px; }
   .panel-back a { color:var(--wine); text-decoration:none; font-weight:600; font-size:12.5px;
@@ -132,6 +136,7 @@
     <div class="card off" id="micCard">
       <h2>Use your microphone (live)</h2>
       <button id="mic" class="mic" aria-pressed="false">● Start microphone</button>
+      <div class="micstat" id="micStatus" aria-live="polite"></div>
       <div class="note" id="micNote"><strong>Experimental · desktop only.</strong> First use
         downloads the ~420 MB model (cached after — one-time) and runs it on your CPU in a
         background worker, so the brain refreshes every few seconds — speak continuously.</div>
