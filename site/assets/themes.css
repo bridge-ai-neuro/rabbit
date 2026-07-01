@@ -1,0 +1,160 @@
+/* ============================================================================
+   RABBiT — THEME SYSTEM  (light · moderate/sepia · dark)
+   ----------------------------------------------------------------------------
+   Self-contained and easy to REVERT: this whole file plus (a) the `data-theme`
+   attribute on <html>, (b) the small no-FOUC init <script> in <head>, (c) the
+   #theme-toggle button in the nav, and (d) the toggle click handler are the ONLY
+   theme code. Delete those and the site returns to its original light look —
+   style.css's :root is never edited; the "refined light" is a [data-theme=light]
+   override here.
+
+   Everything re-themes through CSS custom properties. The accent aliases in
+   style.css (--accent, --zero-color, ...) are var(--indigo)/var(--steel)/..., so
+   overriding the base Paul-Tol hues below cascades to the whole page.
+   ============================================================================ */
+
+/* ─── LIGHT (refined) ─── crisper ink, darker muted text, cleaner neutrals ──── */
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg:        #fcfcf9;
+  --bg-elev:   #ffffff;
+  --bg-soft:   #f4f3ee;
+  --bg-code:   #f5f4ef;
+  --bg-band:   #f1f1ed;
+  --ink:       #1b1a18;
+  --ink-soft:  #423f39;
+  --ink-mute:  #6f6b62;   /* darker than the original #7d7972 for legibility */
+  --line:      #dad8d2;
+  --line-soft: #e9e7e1;
+}
+
+/* ─── MODERATE (warm sepia) ─── cream paper, dark-brown ink, low blue light ─── */
+html[data-theme="moderate"] {
+  color-scheme: light;
+  --bg:        #f2e9d8;
+  --bg-elev:   #faf3e4;
+  --bg-soft:   #ebe0cb;
+  --bg-code:   #ece2ce;
+  --bg-band:   #ece1cc;
+  --ink:       #3a3225;
+  --ink-soft:  #59503d;
+  --ink-mute:  #877a62;
+  --line:      #dacdb2;
+  --line-soft: #e6dcc4;
+  /* Paul-Tol accents read fine on cream — leave them as style.css defines. */
+}
+html[data-theme="moderate"] nav.top          { background: rgba(242,233,216,0.90); }
+html[data-theme="moderate"] nav.top.scrolled { background: rgba(242,233,216,0.97); }
+
+/* ─── DARK (warm charcoal, not black) ──────────────────────────────────────── */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:        #191816;
+  --bg-elev:   #221f1b;
+  --bg-soft:   #201d1a;
+  --bg-code:   #1d1b18;
+  --bg-band:   #1e1b18;
+  --ink:       #eae7e0;
+  --ink-soft:  #b7b2a8;
+  --ink-mute:  #857f75;
+  --line:      #38342f;
+  --line-soft: #2a2723;
+  /* Lightened Paul-Tol hues so accents read on a dark surface (the originals —
+     indigo #332288, wine #882255 — are far too dark). Aliases follow via var(). */
+  --wine:      #d76a90;
+  --rose:      #e08a99;
+  --purple:    #c98fc0;
+  --steel:     #7fb2e6;
+  --teal:      #5fc9b6;
+  --darkgreen: #58c47e;
+  --olive:     #c6c266;
+  --indigo:    #a99cf0;
+  --sand:      #e8d99a;
+  --cyan:      #9ad9f2;
+  --shadow-soft: 0 1px 2px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.55);
+}
+
+/* Frosted nav on dark */
+html[data-theme="dark"] nav.top {
+  background: rgba(25,24,22,0.82);
+  border-bottom-color: var(--line);
+}
+html[data-theme="dark"] nav.top.scrolled {
+  background: rgba(25,24,22,0.96);
+  box-shadow: 0 1px 0 var(--line), 0 6px 22px rgba(0,0,0,0.55);
+}
+
+/* Keep the Live-demo CTA a mid steel→wine so white text stays readable on dark
+   (the lightened accent tokens would wash it out). */
+html[data-theme="dark"] .links a.cta-demo,
+html[data-theme="dark"] .links a.cta-demo:hover,
+html[data-theme="dark"] nav.top .nav-cta,
+html[data-theme="dark"] nav.top .nav-cta:hover {
+  background: linear-gradient(100deg, #5f92c4 0%, #b0466f 100%);
+  color: #fff;
+}
+
+/* The black wordmark is invisible on dark — flip it to white (it's grayscale). */
+html[data-theme="dark"] .brand-lockup,
+html[data-theme="dark"] .hero-lockup { filter: invert(1); }
+
+/* Figures are opaque PNGs with light backgrounds; on dark they'd be raw white
+   rectangles. Frame them: the figure media sits on a light card (a "mat"), with
+   the caption inside that card switched to dark ink so it stays legible. The
+   explanatory text BESIDE the figure stays on the dark page (light ink). */
+html[data-theme="dark"] .figmedia,
+html[data-theme="dark"] figure.fig {
+  background: #f3f1ea;
+  border-color: #e3ded3;
+}
+html[data-theme="dark"] figure.hero-fig {
+  background: #f3f1ea;
+  border: 1px solid #e3ded3;
+  border-radius: var(--radius);
+  padding: 1rem 1rem 0.4rem;
+}
+html[data-theme="dark"] figure.hero-fig img { filter: none; }
+html[data-theme="dark"] .figmedia.bordered img,
+html[data-theme="dark"] figure.fig.bordered img { border-color: #e3ded3; }
+html[data-theme="dark"] .figmedia .figcap,
+html[data-theme="dark"] figure.fig figcaption,
+html[data-theme="dark"] .teaser-cap {
+  color: #4b4942;
+}
+html[data-theme="dark"] .figmedia .figcap .num,
+html[data-theme="dark"] figure.fig figcaption .num { color: #7c766c; }
+html[data-theme="dark"] .figmedia .figcap em,
+html[data-theme="dark"] figure.fig figcaption em,
+html[data-theme="dark"] .teaser-cap em { color: #4b4942; }
+html[data-theme="dark"] .teaser-cap strong { color: #2a2823; }
+
+/* The hero inference video is also a light-background clip — give it a quiet mat
+   so it doesn't float as a bright rectangle. */
+html[data-theme="dark"] .hero-video {
+  background: #f3f1ea;
+  padding: 6px;
+  border: 1px solid #e3ded3;
+}
+
+/* ─── Theme toggle button (nav) ────────────────────────────────────────────── */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  cursor: pointer;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink-soft);
+  flex: none;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+.theme-toggle:hover { background: var(--bg-soft); color: var(--ink); }
+.theme-toggle:focus-visible { outline: 2px solid var(--steel); outline-offset: 2px; }
+.theme-toggle .ti { display: none; }
+html[data-theme="light"]    .theme-toggle .ti-light,
+html[data-theme="moderate"] .theme-toggle .ti-moderate,
+html[data-theme="dark"]     .theme-toggle .ti-dark { display: block; }
