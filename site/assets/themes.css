@@ -98,6 +98,9 @@ html[data-theme="dark"] nav.top .nav-cta:hover {
 html[data-theme="dark"] .brand-lockup,
 html[data-theme="dark"] .hero-lockup { filter: invert(1); }
 
+/* The MPI-SWS affiliation logo is a solid #333 wordmark — lighten it for dark. */
+html[data-theme="dark"] .mpi-logo { filter: invert(1); opacity: 0.85; }
+
 /* Figures are opaque PNGs with light backgrounds; on dark they'd be raw white
    rectangles. Frame them: the figure media sits on a light card (a "mat"), with
    the caption inside that card switched to dark ink so it stays legible. The

@@ -29,7 +29,7 @@ const asF32 = (b) => new Float32Array(b.buffer, b.byteOffset, b.byteLength / 4);
 const asI32 = (b) => new Int32Array(b.buffer, b.byteOffset, b.byteLength / 4);
 
 const S = { rm: null, params: null, clips: null, flatToFs6: null, baseColor: null, colorAttr: null,
-  preds: null, nPred: 0, clip: null, playing: false, IN: 0, curClip: null, transcripts: null,
+  preds: null, nPred: 0, clip: null, playing: false, IN: 0, curClip: null, transcripts: null, clipGen: 0,
   worker: null, ep: "", pending: null, reqId: 0, mic: null, modelWarm: null, clipCtx: null,
   whisper: null, whisperInit: null, whisperEp: "", whisperPending: null, whisperReq: 0 };
 
@@ -102,16 +102,24 @@ function pushCaption(text) {
 }
 function clearCaption() { S.capWords = []; const el = $("caption"); el.textContent = ""; el.classList.remove("show"); }
 
-// Whisper invents text on silence/noise. Skip near-silent windows, and drop the
-// stock hallucinations and single-word loops it still produces.
-function audioRms(a) { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * a[i]; return Math.sqrt(s / (a.length || 1)); }
-const CAPTION_JUNK = /^(you|thank you[.!]?|thanks for watching[.!]?|please subscribe[.!]?|bye[.!]?|\.|♪.*|\[.*\]|\(.*\))$/i;
-function captionLooksBad(t) {
-  const s = (t || "").trim();
-  if (s.length < 2 || CAPTION_JUNK.test(s)) return true;
-  const w = s.toLowerCase().replace(/[.,!?]/g, "").split(/\s+/).filter(Boolean);
-  return w.length >= 4 && new Set(w).size <= 2;   // e.g. "the the the the"
+// Reveal a clip's precomputed transcript progressively — word by word across each
+// segment's [start,end] — so the caption tracks the audio even when a clip is one
+// long segment (otherwise the whole line dumps at t=0, over the intro/laughter).
+function clipCaptionAt(el, segs) {
+  const out = [];
+  for (const s of segs) {
+    const st = s.start ?? 0;
+    if (el < st) break;
+    const en = (s.end != null && s.end > st) ? s.end : st + 3;
+    const words = (s.text || "").trim().split(/\s+/).filter(Boolean);
+    const n = Math.min(words.length, Math.ceil(Math.min(1, (el - st) / (en - st)) * words.length));
+    for (let i = 0; i < n; i++) out.push(words[i]);
+  }
+  return out.slice(-44).join(" ");
 }
+
+// Light silence mask for live mic captions (Whisper invents text on silence).
+function audioRms(a) { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * a[i]; return Math.sqrt(s / (a.length || 1)); }
 
 // ── Startup ──
 function showNoWebGL() {
@@ -160,41 +168,42 @@ async function init() {
 
 // ── Clip playback ──
 async function run() {
-  $("run").disabled = true; stopMic();
+  stopMic();
+  const gen = ++S.clipGen;                          // supersede any clip already playing
+  const meta = S.clips.find((c) => c.id === $("clipSel").value);
+  S.curClip = meta; clearCaption();
   try {
-    const meta = S.clips.find((c) => c.id === $("clipSel").value);
-    S.curClip = meta; clearCaption();
     setStatus(`loading ${meta.label}…`); setProg(0.2);
     const [predsB, clipB] = await Promise.all([fetchBuf(`assets/preds_${meta.id}.f32`), fetchBuf("assets/" + meta.file)]);
+    if (S.clipGen !== gen) return;                  // user switched clips during the load
     S.preds = asF32(predsB); S.nPred = meta.n_tr; S.clip = asF32(clipB); S.params.sample_rate = meta.sample_rate;
-    setProg(1);
-    setStatus(`${meta.label}: playing…`);
-    await playAudioAnimate();
+    setProg(1); setStatus(`${meta.label}: playing…`);
+    await playAudioAnimate(gen);
+    if (S.clipGen !== gen) return;                  // superseded by a newer clip → leave it alone
     resetBrain(); clearCaption();
     setStatus(`${meta.label}: done — replay or pick another.`);
-  } catch (e) { setStatus("✗ " + e.message); console.error(e); }
-  finally { $("run").disabled = false; }
+  } catch (e) { if (S.clipGen === gen) { setStatus("✗ " + e.message); console.error(e); } }
 }
-function playAudioAnimate() {
-  const p = S.params, dur = S.clip.length / p.sample_rate, OUT = S.rm.flat_dim;
-  try {
-    if (S.clipCtx) { S.clipCtx.close().catch(() => {}); S.clipCtx = null; }   // close the previous clip's context
-    const ctx = new (window.AudioContext || window.webkitAudioContext)(); S.clipCtx = ctx;
-    const b = ctx.createBuffer(1, S.clip.length, p.sample_rate); b.copyToChannel(S.clip, 0);
-    const src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination);
-    ctx.resume().then(() => src.start()).catch(() => { try { src.start(); } catch {} });   // start once running
-  } catch (e) { console.warn("audio:", e.message); }
+function playAudioAnimate(gen) {
+  const p = S.params, clip = S.clip, preds = S.preds, nPred = S.nPred, OUT = S.rm.flat_dim;
+  const dur = clip.length / p.sample_rate;
   const segs = (S.transcripts && S.curClip) ? (S.transcripts[S.curClip.id] || []) : [];
-  S.capWords = []; let segIdx = 0;
-  const t0 = performance.now(); S.playing = true;
+  try {
+    if (S.clipCtx) { try { S.clipCtx.close(); } catch {} }     // stop the previous clip's audio
+    const ctx = new (window.AudioContext || window.webkitAudioContext)(); S.clipCtx = ctx; ctx.resume();
+    const b = ctx.createBuffer(1, clip.length, p.sample_rate); b.copyToChannel(clip, 0);
+    const src = ctx.createBufferSource(); src.buffer = b; src.connect(ctx.destination); src.start();
+  } catch (e) { console.warn("audio:", e.message); }
+  const t0 = performance.now();
   return new Promise((resolve) => {
     (function tick() {
-      if (!S.playing) return resolve();
+      if (S.clipGen !== gen) return resolve();                 // switched/stopped → end this loop
       const el = (performance.now() - t0) / 1000;
-      if (el > dur + 0.3) { S.playing = false; return resolve(); }
-      const tr = Math.min(S.nPred - 1, Math.floor(el / p.tr_length));
-      paintFrame(S.preds.subarray(tr * OUT, (tr + 1) * OUT));
-      while (segIdx < segs.length && (segs[segIdx].start ?? 0) <= el) { pushCaption(segs[segIdx].text); segIdx++; }
+      if (el > dur + 0.3) return resolve();
+      const tr = Math.min(nPred - 1, Math.floor(el / p.tr_length));
+      paintFrame(preds.subarray(tr * OUT, (tr + 1) * OUT));
+      const cap = clipCaptionAt(el, segs);
+      if (cap) { const c = $("caption"); c.textContent = cap; c.classList.add("show"); }
       requestAnimationFrame(tick);
     })();
   });
@@ -332,11 +341,10 @@ function whisperRun(audio) {
 async function captionTick() {
   const m = S.mic; if (!m || m.capBusy || !m.ring || m.ring.length < 8000) return;
   if (!S.whisper) { ensureWhisper().catch(() => {}); return; }      // (re)build if missing/recycled
-  const recent = m.ring.slice(Math.max(0, m.ring.length - Math.round(1.5 * 16000)));
-  if (audioRms(recent) < 0.0025) return;     // near-silence over the last ~1.5s → don't ask Whisper
   const win = m.ring.slice(Math.max(0, m.ring.length - 5 * 16000));
+  if (audioRms(win) < 0.004) return;         // light silence mask: skip only near-silent windows
   m.capBusy = true;
-  try { const text = await whisperRun(win); if (S.mic === m && !captionLooksBad(text)) pushCaption(text); }
+  try { const text = await whisperRun(win); if (S.mic === m && text) pushCaption(text); }
   catch (e) { console.warn("whisper:", e.message); }
   finally { m.capBusy = false; }            // always release so a hiccup can't freeze captions
 }
