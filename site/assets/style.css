@@ -87,7 +87,7 @@ nav.top {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250,249,246,0.92);
+  background: rgba(250,249,246,0.96);
   backdrop-filter: saturate(160%) blur(8px);
   -webkit-backdrop-filter: saturate(160%) blur(8px);
   border-bottom: 1px solid var(--line-soft);
@@ -158,6 +158,7 @@ nav.top a.section-link:hover { background: var(--bg-soft); color: var(--ink); }
 
 @media (max-width: 1024px) {
   .nav-toggle { display: inline-flex; }
+  nav.top .right { gap: 0.7rem; }                 /* room between CTA + hamburger */
   nav.top .right .pill-link { display: none; }   /* Paper/Code move into the menu */
   .nav-links {
     position: absolute; top: 100%; left: 0; right: 0;
@@ -198,17 +199,17 @@ nav.top .pill-link:hover { background: var(--ink); color: var(--bg); border-colo
    hero, and a thin steel→wine line along its bottom edge tracks page progress. */
 nav.top { transition: background-color 200ms ease, box-shadow 200ms ease; }
 nav.top.scrolled {
-  background: rgba(250, 249, 246, 0.97);
-  box-shadow: 0 1px 0 var(--line-soft), 0 8px 24px rgba(0, 0, 0, 0.05);
+  background: rgba(250, 249, 246, 0.985);
+  box-shadow: 0 1px 0 var(--line-soft), 0 6px 20px rgba(0, 0, 0, 0.07);
 }
 
 nav.top a.section-link.active {
-  color: var(--ink);
-  font-weight: 600;
-  background: color-mix(in srgb, var(--active-sec, var(--accent)) 15%, transparent);
+  color: var(--wine);                        /* one consistent active accent */
+  font-weight: 700;
+  background: color-mix(in srgb, var(--wine) 12%, transparent);
 }
 @supports not (color: color-mix(in srgb, red, blue)) {
-  nav.top a.section-link.active { background: var(--bg-soft); }
+  nav.top a.section-link.active { background: var(--bg-soft); color: var(--wine); }
 }
 
 /* Scroll-progress line along the bottom edge of the bar (all widths). */
@@ -216,10 +217,16 @@ nav.top a.section-link.active {
   position: absolute;
   left: 0; right: 0; bottom: -1px;
   height: 2px;
+  background: var(--line-soft);          /* faint full-width track */
+  pointer-events: none;
+}
+.nav-progress::after {                    /* the steel→wine fill grows with scroll */
+  content: "";
+  position: absolute;
+  inset: 0;
   transform: scaleX(var(--p, 0));
   transform-origin: 0 50%;
   background: linear-gradient(90deg, var(--steel), var(--wine));
-  pointer-events: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -291,6 +298,7 @@ nav.top .brand .brand-lockup {
   height: 20px;
   width: auto;
   display: block;
+  transform: translateY(1.5px);   /* drop the ear-heavy wordmark onto the link centreline */
 }
 .hero-mark {
   width: 64px;
@@ -441,9 +449,7 @@ a:focus-visible, button:focus-visible, select:focus-visible,
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0; height: 3px;
-  background: linear-gradient(90deg,
-    var(--wine) 0%, var(--rose) 20%, var(--purple) 40%,
-    var(--steel) 60%, var(--teal) 80%, var(--darkgreen) 100%);
+  background: linear-gradient(90deg, var(--steel), var(--wine));
 }
 .numbers .row {
   display: grid;
@@ -1127,14 +1133,14 @@ svg.icon { width: 1em; height: 1em; vertical-align: -0.15em; }
   .hero, .numbers, .section { padding: 1rem; }
 }
 
-/* ─── Wide-screen shell (LAST so it wins over base container width/margins) ───
-   The content column is centred symmetrically in the viewport — equal gutters
-   on both sides, no right-shift — and grows with the viewport up to a readable
-   cap. The floating TOC is handled separately (it only docks into the gutter on
-   ultrawide, where there's room for it clear of the content). */
+/* ─── Wide-screen shell (LAST so it wins over base container width/margins) ────
+   1320–1499px: content centred symmetrically, no side nav.
+   ≥1500px: reserve a real column for the "On this page" side nav on the right,
+   and centre the [content | side-nav] unit as one block, so the outer gutters
+   stay equal and the side nav reads as part of the layout (not floating margin). */
 @media (min-width: 1320px) {
   :root {
-    --content: clamp(1240px, calc(100vw - 2 * clamp(56px, 7vw, 300px)), 1680px);
+    --content: clamp(1240px, calc(100vw - 2 * clamp(56px, 7vw, 300px)), 1560px);
   }
   .hero .container,
   .numbers-wrap,
@@ -1143,5 +1149,76 @@ svg.icon { width: 1em; height: 1em; vertical-align: -0.15em; }
     max-width: var(--content) !important;
     margin-left: auto !important;
     margin-right: auto !important;
+  }
+}
+@media (min-width: 1500px) {
+  :root {
+    --pnav: 210px;                 /* side-nav width */
+    --pnav-gap: 46px;              /* gap between content and side nav */
+    --pnavzone: 256px;            /* --pnav + --pnav-gap */
+    --content: clamp(1180px, calc(100vw - 2 * clamp(48px, 5vw, 220px) - var(--pnavzone)), 1560px);
+    --shell-left: calc((100vw - var(--content) - var(--pnavzone)) / 2);
+  }
+  .hero .container,
+  .numbers-wrap,
+  .section,
+  footer .inner {
+    margin-left: var(--shell-left) !important;
+    margin-right: auto !important;
+  }
+}
+
+/* ─── "On this page" side nav — a visible, labelled list, no boxy card ────────
+   Shown ≥1500px in the reserved right column. A quiet vertical rail; the current
+   section is marked by bold ink text + an accent-coloured rail segment. */
+.page-nav { display: none; }
+@media (min-width: 1500px) {
+  .page-nav {
+    display: block;
+    position: fixed;
+    top: 5.6rem;
+    left: calc(var(--shell-left) + var(--content) + var(--pnav-gap));
+    width: var(--pnav);
+    max-height: calc(100vh - 7.5rem);
+    overflow-y: auto;
+    z-index: 20;
+  }
+  .page-nav-title {
+    margin: 0 0 0.55rem 0.95rem;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 700;
+    color: var(--ink-mute);
+  }
+  .page-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 2px solid var(--line);
+  }
+  .page-nav li { margin: 0; }
+  .page-nav a {
+    display: block;
+    padding: 0.38rem 0 0.38rem 0.95rem;
+    margin-left: -2px;
+    border-left: 2px solid transparent;
+    border-bottom: none;
+    color: #5f5a52;                 /* a touch darker than --ink-mute for legibility */
+    font-size: 0.88rem;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+  .page-nav a:hover { color: var(--ink); border-left-color: var(--ink-mute); }
+  .page-nav a.active {
+    color: var(--wine);                     /* matches the top-bar active accent */
+    font-weight: 700;
+    border-left-color: var(--wine);         /* colours the 2px rail segment in place */
+    background: color-mix(in srgb, var(--wine) 8%, transparent);
+    border-radius: 0 6px 6px 0;
+  }
+  @supports not (color: color-mix(in srgb, red, blue)) {
+    .page-nav a.active { background: var(--bg-soft); }
   }
 }

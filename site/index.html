@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="RABBiT — Speech-to-fMRI Foundation Model">
 <meta name="twitter:description" content="Predicts a new person's speech-evoked fMRI from audio alone — zero-shot, adapts in ~10 min. Try the live in-browser demo.">
 <meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
-<link rel="stylesheet" href="assets/style.css?v=4">
+<link rel="stylesheet" href="assets/style.css?v=8">
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
 <!-- KaTeX for in-page LaTeX math rendering (formulas in the architecture section) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
@@ -52,6 +52,21 @@
     </span>
   </div>
   <div class="nav-progress" aria-hidden="true"></div>
+</nav>
+
+<!-- ─── "On this page" side nav (wide screens; reserved right column) ─────── -->
+<nav class="page-nav" aria-label="On this page">
+  <p class="page-nav-title">On this page</p>
+  <ul>
+    <li><a href="#top"        style="--sec:var(--ink-mute)">Overview</a></li>
+    <li><a href="#what"       style="--sec:var(--ink-mute)">Two ways to use it</a></li>
+    <li><a href="#foundation" style="--sec:var(--teal)">A language network</a></li>
+    <li><a href="#zeroshot"   style="--sec:var(--steel)">Zero-shot</a></li>
+    <li><a href="#fewshot"    style="--sec:var(--wine)">Few-shot</a></li>
+    <li><a href="#how"        style="--sec:var(--indigo)">How it works</a></li>
+    <li><a href="#resources"  style="--sec:var(--darkgreen)">Resources</a></li>
+    <li><a href="#cite"       style="--sec:var(--ink-mute)">Cite</a></li>
+  </ul>
 </nav>
 
 <!-- ─── HERO ────────────────────────────────────────────────────────── -->
@@ -546,11 +561,11 @@
     const nav   = document.querySelector('nav.top');
     const prog  = nav && nav.querySelector('.nav-progress');
     const doc   = document.documentElement;
-    const links = Array.from(document.querySelectorAll('nav.top a.section-link'));
-    const idToLink = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
-    const secs = ['what', 'foundation', 'zeroshot', 'fewshot', 'how', 'cite']
-                   .map(id => document.getElementById(id)).filter(Boolean);
-    let ticking = false, curId = '';
+    // both navs share one spy: top-bar links (subset) + the side nav (all sections)
+    const allLinks = Array.from(document.querySelectorAll('nav.top a.section-link, .page-nav a'));
+    const spy = ['top', 'what', 'foundation', 'zeroshot', 'fewshot', 'how', 'resources', 'cite'];
+    const secs = spy.map(id => document.getElementById(id)).filter(Boolean);
+    let ticking = false, curId = null;
     function update() {
       ticking = false;
       const max = doc.scrollHeight - doc.clientHeight;
@@ -561,9 +576,12 @@
       for (const s of secs) if (s.offsetTop <= line) activeId = s.id;
       if (activeId !== curId) {
         curId = activeId;
-        const link = activeId ? idToLink.get(activeId) : null;
-        links.forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
-        if (link) { link.classList.add('active'); link.setAttribute('aria-current', 'true'); }
+        const sel = '#' + activeId;
+        allLinks.forEach(a => {
+          const on = !!activeId && a.getAttribute('href') === sel;
+          a.classList.toggle('active', on);
+          if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+        });
         if (nav && activeId) {
           const el = document.getElementById(activeId);
           const accent = el ? getComputedStyle(el).getPropertyValue('--sec').trim() : '';
