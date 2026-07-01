@@ -192,129 +192,38 @@ nav.top .pill-link:hover { background: var(--ink); color: var(--bg); border-colo
 .section.tight { padding-top: 1.4rem; padding-bottom: 1.4rem; }
 .section.first { padding-top: 4.5rem; }
 
-/* ─── Chapter Rail — a chromeless scroll-progress spine in the right gutter ───
-   Replaces the old boxed "On this page" card. At rest it is just a faint spine
-   plus one accent-tinted tick per section that fills as you scroll. Hovering the
-   rail (or focusing a tick) reveals the labels on frosted pills. Below 1200px it
-   hides and a slim steel→wine top progress bar takes over; the top-nav hamburger
-   stays the mobile section menu. */
-.chapter-rail { display: none; }
-
-@media (min-width: 1200px) {
-  .chapter-rail {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    position: fixed;
-    top: 50%;
-    right: max(0.9rem, calc((100vw - var(--content, 1240px)) / 2 - 26px));
-    transform: translateY(-50%);
-    z-index: 40;                 /* under nav.top (50) */
-    background: none;            /* NO card chrome at rest — the whole point */
-    border: none;
-    box-shadow: none;
-  }
-  .chapter-rail::before {        /* faint connector spine behind the ticks */
-    content: "";
-    position: absolute;
-    right: 3px; top: 5px; bottom: 5px;
-    width: 1px;
-    background: var(--line);
-  }
-  .chapter-rail a {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;   /* ticks flush to the right edge of the rail */
-    height: 24px;
-    border: none;
-    border-bottom: none;
-    text-decoration: none;
-  }
-  .chapter-rail a::after {       /* the tick / progress segment, fills bottom-up */
-    content: "";
-    width: 7px; height: 24px;
-    border-radius: 4px;
-    background: linear-gradient(to top,
-      var(--sec, var(--accent)) calc(var(--seg, 0) * 100%),
-      var(--line-soft)          calc(var(--seg, 0) * 100%));
-    transition: width 160ms ease, box-shadow 160ms ease, transform 160ms ease;
-  }
-  .chapter-rail a.done::after  { --seg: 1; opacity: 0.5; }
-  .chapter-rail a.active::after {
-    width: 8px;
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sec, var(--accent)) 18%, transparent);
-  }
-  .chapter-rail a:hover::after,
-  .chapter-rail a:focus-visible::after { --seg: 1; }
-
-  .chapter-rail .lab {           /* label sits to the LEFT of the tick */
-    position: absolute;
-    right: calc(100% + 0.7rem);
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    white-space: nowrap;
-    opacity: 0;
-    transform: translateX(6px);
-    pointer-events: none;
-    transition: opacity 160ms ease, transform 160ms ease;
-  }
-  .chapter-rail .lab .ix {
-    font-family: "Iowan Old Style","Charter",Georgia,serif;
-    font-size: 0.74rem;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink-mute);
-  }
-  .chapter-rail .lab .ti { font-size: 0.82rem; font-weight: 500; color: var(--ink-soft); }
-  .chapter-rail .lab::before {   /* frosted pill behind a revealed label */
-    content: "";
-    position: absolute;
-    inset: -0.28rem -0.7rem;
-    background: rgba(253, 253, 251, 0.93);
-    -webkit-backdrop-filter: saturate(160%) blur(8px);
-    backdrop-filter: saturate(160%) blur(8px);
-    border-radius: 999px;
-    box-shadow: var(--shadow-soft);
-    opacity: 0;
-    transition: opacity 160ms ease;
-    z-index: -1;
-  }
-  /* reveal: hover the whole rail (group expand) or focus a single stop */
-  .chapter-rail:hover .lab,
-  .chapter-rail a:focus-visible .lab { opacity: 1; transform: translateX(0); }
-  .chapter-rail:hover .lab::before,
-  .chapter-rail a:focus-visible .lab::before { opacity: 1; }
-  .chapter-rail a.active .ix { color: var(--sec, var(--accent)); font-weight: 700; }
-  .chapter-rail a.active .ti { color: var(--ink); }
+/* ─── Navigation — the sticky top bar IS the nav ─────────────────────────────
+   Scroll-spy lights the link of the section you're in (a tab-style underline in
+   that section's accent colour), the bar gains a soft shadow once you leave the
+   hero, and a thin steel→wine line along its bottom edge tracks page progress. */
+nav.top { transition: background-color 200ms ease, box-shadow 200ms ease; }
+nav.top.scrolled {
+  background: rgba(250, 249, 246, 0.97);
+  box-shadow: 0 1px 0 var(--line-soft), 0 8px 24px rgba(0, 0, 0, 0.05);
 }
 
-/* mid widths: gutter too tight for labels — show ticks only, hugging the edge */
-@media (min-width: 1200px) and (max-width: 1439px) {
-  .chapter-rail { right: 0.75rem; }
-  .chapter-rail .lab { display: none; }
+nav.top a.section-link.active {
+  color: var(--ink);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--active-sec, var(--accent)) 15%, transparent);
 }
-
 @supports not (color: color-mix(in srgb, red, blue)) {
-  .chapter-rail a.active::after { box-shadow: none; }
+  nav.top a.section-link.active { background: var(--bg-soft); }
 }
 
-/* Top scroll-progress bar — phone + tablet, where the rail is hidden. */
-.scroll-progress {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  z-index: 60;
+/* Scroll-progress line along the bottom edge of the bar (all widths). */
+.nav-progress {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
   transform: scaleX(var(--p, 0));
   transform-origin: 0 50%;
   background: linear-gradient(90deg, var(--steel), var(--wine));
+  pointer-events: none;
 }
-@media (min-width: 1200px) { .scroll-progress { display: none; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .chapter-rail a::after,
-  .chapter-rail .lab,
-  .chapter-rail .lab::before { transition: none; }
+  nav.top { transition: none; }
 }
 
 /* ─── Hero ───────────────────────────────────────────────────────────── */

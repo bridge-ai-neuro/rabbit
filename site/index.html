@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="RABBiT — Speech-to-fMRI Foundation Model">
 <meta name="twitter:description" content="Predicts a new person's speech-evoked fMRI from audio alone — zero-shot, adapts in ~10 min. Try the live in-browser demo.">
 <meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
-<link rel="stylesheet" href="assets/style.css?v=3">
+<link rel="stylesheet" href="assets/style.css?v=4">
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
 <!-- KaTeX for in-page LaTeX math rendering (formulas in the architecture section) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
@@ -51,21 +51,7 @@
               aria-expanded="false" aria-controls="nav-sections"><span class="bars" aria-hidden="true"></span></button>
     </span>
   </div>
-</nav>
-
-<!-- Scroll-progress bar (phone + tablet, where the chapter rail is hidden). -->
-<div class="scroll-progress" aria-hidden="true"></div>
-
-<!-- ─── Chapter rail — chromeless scroll-progress spine in the right gutter ── -->
-<nav class="chapter-rail" aria-label="Sections">
-  <a href="#top"        aria-label="Overview"            style="--sec:var(--ink-mute)"><span class="lab"><span class="ix">00</span><span class="ti">Overview</span></span></a>
-  <a href="#what"       aria-label="Two ways to use it"  style="--sec:var(--ink-mute)"><span class="lab"><span class="ix">01</span><span class="ti">Two ways to use it</span></span></a>
-  <a href="#foundation" aria-label="A language network"  style="--sec:var(--teal)"><span class="lab"><span class="ix">02</span><span class="ti">A language network</span></span></a>
-  <a href="#zeroshot"   aria-label="Zero-shot"           style="--sec:var(--steel)"><span class="lab"><span class="ix">03</span><span class="ti">Zero-shot</span></span></a>
-  <a href="#fewshot"    aria-label="Few-shot"            style="--sec:var(--wine)"><span class="lab"><span class="ix">04</span><span class="ti">Few-shot</span></span></a>
-  <a href="#how"        aria-label="How it works"        style="--sec:var(--indigo)"><span class="lab"><span class="ix">05</span><span class="ti">How it works</span></span></a>
-  <a href="#resources"  aria-label="Resources"           style="--sec:var(--darkgreen)"><span class="lab"><span class="ix">06</span><span class="ti">Resources</span></span></a>
-  <a href="#cite"       aria-label="Cite"                style="--sec:var(--ink-mute)"><span class="lab"><span class="ix">07</span><span class="ti">Cite</span></span></a>
+  <div class="nav-progress" aria-hidden="true"></div>
 </nav>
 
 <!-- ─── HERO ────────────────────────────────────────────────────────── -->
@@ -550,50 +536,40 @@
 
 
 <script>
-  // Chapter-rail scroll-spy: light the tick of the section in view, mark the
-  // ticks above it as "done" (filled), default to Overview at load.
+  // Top-bar navigation behaviour, in one passive rAF-throttled scroll handler:
+  //  (1) highlight the link of the section you're reading — the lowest linked
+  //      section whose top has passed a reference line ~30% down the viewport
+  //      (robust at the page bottom, where the last section can't reach a band);
+  //  (2) tint the active highlight with that section's accent;
+  //  (3) fill the bottom-edge progress line; (4) condense the bar once scrolled.
   (function () {
-    const links = Array.from(document.querySelectorAll('.chapter-rail a'));
+    const nav   = document.querySelector('nav.top');
+    const prog  = nav && nav.querySelector('.nav-progress');
+    const doc   = document.documentElement;
+    const links = Array.from(document.querySelectorAll('nav.top a.section-link'));
     const idToLink = new Map(links.map(a => [a.getAttribute('href').slice(1), a]));
-    const targets = Array.from(idToLink.keys())
-                         .map(id => document.getElementById(id))
-                         .filter(Boolean);
-    if (!targets.length || !('IntersectionObserver' in window)) return;
-    if (links[0]) links[0].classList.add('active');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        const link = idToLink.get(e.target.id);
-        if (!link || !e.isIntersecting) return;
-        links.forEach(a => a.classList.remove('active'));
-        link.classList.add('active');
-        const ai = links.indexOf(link);
-        links.forEach((a, i) => a.classList.toggle('done', i < ai));
-      });
-    }, { rootMargin: '-25% 0px -55% 0px', threshold: 0 });
-    targets.forEach(t => observer.observe(t));
-  })();
-
-  // Smooth progress: fill the active rail tick by how far its section has
-  // scrolled, and drive the phone/tablet top progress bar. Passive + rAF.
-  (function () {
-    const rail = document.querySelector('.chapter-rail');
-    const bar  = document.querySelector('.scroll-progress');
-    const doc  = document.documentElement;
-    let ticking = false;
+    const secs = ['what', 'foundation', 'zeroshot', 'fewshot', 'how', 'cite']
+                   .map(id => document.getElementById(id)).filter(Boolean);
+    let ticking = false, curId = '';
     function update() {
       ticking = false;
       const max = doc.scrollHeight - doc.clientHeight;
-      if (bar) bar.style.setProperty('--p', (max > 0 ? doc.scrollTop / max : 0).toFixed(4));
-      if (!rail) return;
-      const act = rail.querySelector('a.active');
-      rail.querySelectorAll('a').forEach(a => { if (a !== act) a.style.removeProperty('--seg'); });
-      if (!act) return;
-      const sec = document.getElementById(act.getAttribute('href').slice(1));
-      if (!sec) return;
-      const r = sec.getBoundingClientRect();
-      const vh = window.innerHeight || doc.clientHeight;
-      const seg = Math.min(1, Math.max(0, (vh * 0.5 - r.top) / (r.height || vh)));
-      act.style.setProperty('--seg', seg.toFixed(3));
+      if (prog) prog.style.setProperty('--p', (max > 0 ? doc.scrollTop / max : 0).toFixed(4));
+      if (nav) nav.classList.toggle('scrolled', doc.scrollTop > 40);
+      const line = window.scrollY + window.innerHeight * 0.3;
+      let activeId = '';
+      for (const s of secs) if (s.offsetTop <= line) activeId = s.id;
+      if (activeId !== curId) {
+        curId = activeId;
+        const link = activeId ? idToLink.get(activeId) : null;
+        links.forEach(a => { a.classList.remove('active'); a.removeAttribute('aria-current'); });
+        if (link) { link.classList.add('active'); link.setAttribute('aria-current', 'true'); }
+        if (nav && activeId) {
+          const el = document.getElementById(activeId);
+          const accent = el ? getComputedStyle(el).getPropertyValue('--sec').trim() : '';
+          if (accent) nav.style.setProperty('--active-sec', accent);
+        }
+      }
     }
     function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
     addEventListener('scroll', onScroll, { passive: true });
