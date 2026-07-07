@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#fcfcf9">
+<meta name="theme-color" content="#fdfdfd">
 <!-- Set the saved/preferred theme before first paint (no flash). Part of the
      removable theme system — see assets/themes.css. -->
 <script>
@@ -23,8 +23,8 @@
 <meta name="twitter:title" content="RABBiT — Speech-to-fMRI Foundation Model">
 <meta name="twitter:description" content="Predicts a new person's speech-evoked fMRI from audio alone — zero-shot, adapts in ~10 min. Try the live in-browser demo.">
 <meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
-<link rel="stylesheet" href="assets/style.css?v=8">
-<link rel="stylesheet" href="assets/themes.css?v=1">
+<link rel="stylesheet" href="assets/style.css?v=10">
+<link rel="stylesheet" href="assets/themes.css?v=3">
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
 <!-- KaTeX for in-page LaTeX math rendering (formulas in the architecture section) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
@@ -47,7 +47,7 @@
       <a class="section-link" href="#fewshot">Few-shot</a>
       <a class="section-link" href="#how">How it works</a>
       <a class="section-link" href="#cite">Cite</a>
-      <a class="section-link menu-only" href="#release-status">Paper</a>
+      <a class="section-link menu-only" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">Paper</a>
       <a class="section-link menu-only" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">Code</a>
     </div>
     <span class="right">
@@ -57,7 +57,7 @@
         <svg class="ti ti-dark" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3.2a6.6 6.6 0 0 0 9.8 9.6z"/></svg>
       </button>
       <a class="nav-cta" href="demo/"><span aria-hidden="true">🧠</span>&nbsp;Live demo</a>
-      <a class="pill-link" href="#release-status">Paper</a>
+      <a class="pill-link" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">Paper</a>
       <a class="pill-link" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">Code</a>
       <button class="nav-toggle" id="navToggle" aria-label="Open section navigation"
               aria-expanded="false" aria-controls="nav-sections"><span class="bars" aria-hidden="true"></span></button>
@@ -109,8 +109,8 @@
 
         <div class="links">
           <a class="cta-demo" href="demo/"><span class="ico" aria-hidden="true">🧠</span> Try it live<span class="cta-arrow" aria-hidden="true">→</span></a>
-          <a href="#release-status" title="Released with the paper"><span class="ico" aria-hidden="true">📄</span> Paper (PDF)</a>
-          <a class="secondary" href="#release-status" title="arXiv preprint pending review"><span class="ico" aria-hidden="true">🗒️</span> arXiv</a>
+          <a href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer" title="Paper PDF on arXiv"><span class="ico" aria-hidden="true">📄</span> Paper (PDF)</a>
+          <a class="secondary" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer" title="arXiv preprint"><span class="ico" aria-hidden="true">🗒️</span> arXiv</a>
           <a class="secondary" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer" title="Source code on GitHub"><span class="ico" aria-hidden="true">⌗</span> Code</a>
           <a class="secondary" href="#release-status" title="Released with the paper"><span class="ico" aria-hidden="true">📓</span> Demo notebook</a>
         </div>
@@ -160,7 +160,7 @@
   <!-- Teaser figure — below the numbers band -->
   <div class="container" style="padding: 0 1.6rem 3.2rem;">
     <figure class="hero-fig">
-      <img loading="eager" decoding="async" width="1200" height="929" src="assets/teaser.png" alt="RABBiT teaser: zero-shot and few-shot transfer regimes across 324 participants">
+      <img loading="eager" decoding="async" width="1200" height="929" src="assets/teaser.png?v=2" alt="RABBiT teaser: zero-shot and few-shot transfer regimes across 324 participants">
       <figcaption class="teaser-cap">
         <strong>No data from the participant (zero-shot):</strong> audio in, predicted speech-evoked fMRI out — for any new person, with nothing recorded from them.
         &nbsp;·&nbsp;
@@ -220,8 +220,8 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1447" height="1049" src="assets/langloc_intact_vs_degraded.png" alt="Predicted intact-minus-degraded speech contrast on the cortical surface: a left-lateralized language network lights up">
-      <figcaption class="figcap"><span class="num">Fig 1</span>Predicted intact − degraded speech (<em>A&nbsp;−&nbsp;B</em> on the colourbar).</figcaption>
+      <img loading="lazy" decoding="async" width="3320" height="1208" src="assets/tribe_style_intact_vs_degraded.png?v=3" alt="Predicted intact-minus-degraded speech contrast on the cortical surface: a left-lateralized language network lights up">
+      <figcaption class="figcap"><span class="num">Fig 1</span>Predicted intact − degraded speech on the cortical surface.</figcaption>
     </figure>
     <div class="figbody">
       <span class="figref">A classic localizer</span>
@@ -233,7 +233,7 @@
 
   <div class="figrow">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1939" height="1019" src="assets/hierarchy_path_2d_2.png" alt="A greedy similarity walk through the model's learned per-region representations traces the auditory-to-language processing hierarchy">
+      <img loading="lazy" decoding="async" width="1939" height="1019" src="assets/hierarchy_path_2d_2.png?v=2" alt="A greedy similarity walk through the model's learned per-region representations traces the auditory-to-language processing hierarchy">
       <figcaption class="figcap"><span class="num">Fig 2</span>Greedy similarity walk through the model's learned ROI representations.</figcaption>
     </figure>
     <div class="figbody">
@@ -262,7 +262,7 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1548" height="1029" src="assets/brain_corr_zeroshot_21styear_focus_with_legend_normalized_FULL_YlGnBu_unmasked.png" alt="Zero-shot predicted-vs-actual correlation on the cortical surface for a held-out listener — blue, concentrated in auditory and temporal language cortex">
+      <img loading="lazy" decoding="async" width="1548" height="1029" src="assets/brain_corr_zeroshot_21styear_focus_with_legend_normalized_FULL_YlGnBu_unmasked.png?v=2" alt="Zero-shot predicted-vs-actual correlation on the cortical surface for a held-out listener — blue, concentrated in auditory and temporal language cortex">
       <figcaption class="figcap"><span class="num">Fig 3</span>Held-out listener (21st Year narrative) · normalized Pearson&nbsp;<em>r</em>, 0–1 scale.</figcaption>
     </figure>
     <div class="figbody">
@@ -274,7 +274,7 @@
 
   <div class="figrow">
     <figure class="figmedia">
-      <img loading="lazy" decoding="async" width="1450" height="1026" src="assets/brain_aggregate_delta_tribe_legend.png" alt="Cortical map of the RABBiT-minus-TRIBEv2 advantage: blue marks where RABBiT predicts better, concentrated in auditory and temporal cortex; orange marks where TRIBEv2 is better">
+      <img loading="lazy" decoding="async" width="1450" height="1026" src="assets/brain_aggregate_delta_tribe_legend.png?v=2" alt="Cortical map of the RABBiT-minus-TRIBEv2 advantage: blue marks where RABBiT predicts better, concentrated in auditory and temporal cortex; orange marks where TRIBEv2 is better">
       <figcaption class="figcap"><span class="num">Fig 4</span>Δ<em>r</em> = RABBiT − TRIBEv2, −0.2 to +0.2 · blue ⇒ RABBiT better, orange ⇒ TRIBEv2 better.</figcaption>
     </figure>
     <div class="figbody">
@@ -287,7 +287,7 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="2057" height="1199" src="assets/vert_story_twosided_bracket_sensorimotorgrouped.png" alt="Per-region zero-shot accuracy: RABBiT vs TRIBEv2">
+      <img loading="lazy" decoding="async" width="2057" height="1199" src="assets/vert_story_twosided_bracket_sensorimotorgrouped.png?v=2" alt="Per-region zero-shot accuracy: RABBiT vs TRIBEv2">
       <figcaption class="figcap"><span class="num">Fig 5</span>Per-region zero-shot accuracy · RABBiT vs TRIBEv2.</figcaption>
     </figure>
     <div class="figbody">
@@ -300,7 +300,7 @@
 
   <div class="figrow figfull">
     <figure class="figmedia">
-      <img loading="lazy" decoding="async" width="1600" height="554" src="assets/dots_lang_paper_horiz.png" alt="Group-level prediction across language ROIs vs the inter-subject-consistency ceiling: RABBiT reaches the ceiling on Narratives and surpasses it on Le Petit Prince, above TRIBEv2 and a linear baseline">
+      <img loading="lazy" decoding="async" width="1600" height="554" src="assets/dots_lang_paper_horiz.png?v=2" alt="Group-level prediction across language ROIs vs the inter-subject-consistency ceiling: RABBiT reaches the ceiling on Narratives and surpasses it on Le Petit Prince, above TRIBEv2 and a linear baseline">
       <figcaption class="figcap"><span class="num">Fig 6</span>$r_\text{group}$ across bilateral language ROIs · Narratives &amp; Le&nbsp;Petit&nbsp;Prince.</figcaption>
     </figure>
     <div class="figbody">
@@ -325,7 +325,7 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1548" height="1029" src="assets/brain_corr_fewshot_21styear_focus_with_legend_normalized_FULL_YlOrRd_unmasked.png" alt="Few-shot predicted-vs-actual correlation for the same listener after ~10 minutes of their data — warmer and more widespread across the language network">
+      <img loading="lazy" decoding="async" width="1548" height="1029" src="assets/brain_corr_fewshot_21styear_focus_with_legend_normalized_FULL_YlOrRd_unmasked.png?v=2" alt="Few-shot predicted-vs-actual correlation for the same listener after ~10 minutes of their data — warmer and more widespread across the language network">
       <figcaption class="figcap"><span class="num">Fig 7</span>Same listener, after ~10&nbsp;min · normalized Pearson&nbsp;<em>r</em>, 0–1 (same scale as Fig&nbsp;3).</figcaption>
     </figure>
     <div class="figbody">
@@ -337,7 +337,7 @@
 
   <div class="figrow">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1447" height="1011" src="assets/brain_delta_21styear_C400_fewshot_focus_with_legend.png" alt="Cortical map of few-shot minus zero-shot correlation for the same listener: red marks improvement across higher-order language regions, auditory cortex unchanged">
+      <img loading="lazy" decoding="async" width="1447" height="1011" src="assets/brain_delta_21styear_C400_fewshot_focus_with_legend.png?v=2" alt="Cortical map of few-shot minus zero-shot correlation for the same listener: red marks improvement across higher-order language regions, auditory cortex unchanged">
       <figcaption class="figcap"><span class="num">Fig 8</span>Δ<em>r</em> = few-shot − zero-shot, same listener, −0.1 to +0.1 · red ⇒ improved by the 10-min adjustment, blue ⇒ reduced.</figcaption>
     </figure>
     <div class="figbody">
@@ -350,7 +350,7 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1680" height="966" src="assets/fewshot_vs_zeroshot_bars.png" alt="Per-region accuracy, zero-shot versus after ten minutes, across higher-order language regions — every region improves significantly">
+      <img loading="lazy" decoding="async" width="1680" height="966" src="assets/fewshot_vs_zeroshot_bars.png?v=2" alt="Per-region accuracy, zero-shot versus after ten minutes, across higher-order language regions — every region improves significantly">
       <figcaption class="figcap"><span class="num">Fig 9</span>Per-region accuracy · zero-shot (blue) vs few-shot (red) · ∗∗&nbsp;p&lt;0.01, ∗∗∗&nbsp;p&lt;0.001.</figcaption>
     </figure>
     <div class="figbody">
@@ -362,7 +362,7 @@
 
   <div class="figrow">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1500" height="687" src="assets/w2v_saturation_paper_4bar.png" alt="Few-shot vs ridge regression as a function of calibration time">
+      <img loading="lazy" decoding="async" width="1500" height="687" src="assets/w2v_saturation_paper_4bar.png?v=2" alt="Few-shot vs ridge regression as a function of calibration time">
       <figcaption class="figcap"><span class="num">Fig 10</span>Mean language-ROI accuracy vs calibration time · markers are paired <em>t</em>-tests.</figcaption>
     </figure>
     <div class="figbody">
@@ -375,7 +375,7 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1500" height="734" src="assets/per_roi_top_C400_with_direct.png" alt="Per-region percent change at 10 minutes, RABBiT few-shot vs ridge">
+      <img loading="lazy" decoding="async" width="1500" height="734" src="assets/per_roi_top_C400_with_direct.png?v=2" alt="Per-region percent change at 10 minutes, RABBiT few-shot vs ridge">
       <figcaption class="figcap"><span class="num">Fig 11</span>Improvement over own zero-shot at ~10&nbsp;min · ∗∗∗ vs zero-shot.</figcaption>
     </figure>
     <div class="figbody">
@@ -413,7 +413,7 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="2224" height="1123" src="assets/transformer.png" alt="RABBiT cross-attention readout: ROI query tokens attend to the speech-token sequence">
+      <img loading="lazy" decoding="async" width="2224" height="1123" src="assets/transformer.png?v=2" alt="RABBiT cross-attention readout: ROI query tokens attend to the speech-token sequence">
       <figcaption class="figcap"><span class="num">Fig 12</span>ROI query tokens attend to the speech-token sequence.</figcaption>
     </figure>
     <div class="figbody">
@@ -441,7 +441,7 @@
 
   <div class="figrow figfull">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="2700" height="833" src="assets/training-process.png" alt="RABBiT pipeline: audio → speech backbone → TBT → SID → predicted fMRI">
+      <img loading="lazy" decoding="async" width="2700" height="833" src="assets/training-process.png?v=2" alt="RABBiT pipeline: audio → speech backbone → TBT → SID → predicted fMRI">
       <figcaption class="figcap"><span class="num">Fig 13</span>audio → speech backbone → TBT → SID → predicted fMRI.</figcaption>
     </figure>
     <div class="figbody">
@@ -458,7 +458,7 @@
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1548" height="1084" src="assets/appendix_variants_lang_sig.png" alt="Component ablations: removing brain-tuning or the temporal brain transformer hurts; the decomposition matches a far larger per-subject readout">
+      <img loading="lazy" decoding="async" width="1548" height="1084" src="assets/appendix_variants_lang_sig.png?v=2" alt="Component ablations: removing brain-tuning or the temporal brain transformer hurts; the decomposition matches a far larger per-subject readout">
       <figcaption class="figcap"><span class="num">Fig 14</span>Zero-shot accuracy as components are removed or swapped.</figcaption>
     </figure>
     <div class="figbody">
@@ -471,7 +471,7 @@
 
   <div class="figrow">
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1500" height="511" src="assets/sid_diagnostic.png" alt="Leave-one-subject-out diagnostic: auditory regions are shared across people; higher-order language regions are individual">
+      <img loading="lazy" decoding="async" width="1500" height="511" src="assets/sid_diagnostic.png?v=2" alt="Leave-one-subject-out diagnostic: auditory regions are shared across people; higher-order language regions are individual">
       <figcaption class="figcap"><span class="num">Fig 15</span>Group average <em>including</em> (blue) vs <em>excluding</em> (orange) the listener.</figcaption>
     </figure>
     <div class="figbody">
@@ -502,11 +502,11 @@
       <span class="res-desc">Play a clip or speak into your mic — RABBiT predicts a held-out listener's language-network BOLD live in your browser. No server, no install.</span>
       <span class="res-tag">interactive</span>
     </a>
-    <a class="res" href="#release-status">
+    <a class="res" href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer">
       <span class="res-ico" aria-hidden="true">📄</span>
       <span class="res-name">Paper (PDF)</span>
       <span class="res-desc">The NeurIPS submission, including methods, results, and appendix.</span>
-      <span class="res-tag">at release</span>
+      <span class="res-tag">arXiv</span>
     </a>
     <a class="res" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">
       <span class="res-ico" aria-hidden="true">⌗</span>
@@ -535,10 +535,12 @@
   </div>
 
   <div id="release-status" style="margin-top: 1.6rem; padding: 1rem 1.2rem; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: var(--radius); font-size: 0.92rem; color: var(--ink-soft); max-width: 78ch;">
-    <strong>Release status.</strong> The paper PDF, arXiv preprint, code repository,
-    demo notebook, Hugging Face model cards, and pretrained checkpoint downloads will
-    all go public once the submission clears review. Until then, this page and the
-    <a href="demo/">live in-browser demo</a> are the best way to explore RABBiT.
+    <strong>Release status.</strong> The
+    <a href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">arXiv preprint</a>
+    and <a href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">code repository</a>
+    are now public. The demo notebook, Hugging Face model cards, and pretrained
+    checkpoint downloads will follow once the submission clears review. Meanwhile, this
+    page and the <a href="demo/">live in-browser demo</a> are the best way to explore RABBiT.
   </div>
 </section>
 
@@ -549,14 +551,13 @@
   </div>
   <h2>BibTeX</h2>
   <p class="lede">If RABBiT is useful for your work, please cite it.</p>
-  <pre class="bib">@inproceedings{moussa2026rabbit,
+  <pre class="bib">@article{moussa2026rabbit,
   title     = {RABBiT: Rapidly Adaptive {BOLD} Foundation Model via Brain-Tuning
                for Accurate Zero-Shot and Few-Shot Prediction of
                Speech-Elicited Responses in the Brain},
   author    = {Moussa, Omer and others},
-  booktitle = {Advances in Neural Information Processing Systems},
-  year      = {2026},
-  note      = {Under review}
+  journal   = {arXiv preprint arXiv:2607.05171},
+  year      = {2026}
 }</pre>
 </section>
 
