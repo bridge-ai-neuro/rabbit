@@ -767,7 +767,9 @@ figure.fig.bordered img { border: none; }
 }
 .figmedia.bordered img { border: none; }
 .figmedia .figcap {
-  margin: 0.8rem 0.2rem 0.1rem;
+  margin: 0.8rem auto 0.1rem;
+  max-width: 68ch;
+  text-align: center;
   font-size: 0.82rem;
   line-height: 1.5;
   color: var(--ink-mute);
