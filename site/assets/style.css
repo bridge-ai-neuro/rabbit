@@ -679,12 +679,15 @@ a:focus-visible, button:focus-visible, select:focus-visible,
 
 /* ─── Figure block — main results ────────────────────────────────────── */
 figure.fig {
+  /* Figures now have transparent backgrounds (see assets/_fig_orig for the
+     opaque originals), so they dissolve into the page rather than floating as
+     white cards. The dark theme re-establishes a light "mat" in themes.css so
+     black plot text stays legible on charcoal. */
   margin: 1.4rem 0;
-  background: var(--bg-elev);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1.4rem;
-  box-shadow: var(--shadow-soft);
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
 }
 figure.fig img {
   display: block;
@@ -711,7 +714,7 @@ figure.fig figcaption .num {
 figure.fig.full img { max-width: min(100%, 1100px); }
 figure.fig.media-only { padding: 0.7rem; }
 figure.fig.media-only figcaption { padding: 0.4rem 0.8rem 0; }
-figure.fig.bordered img { border: 1px solid var(--line-soft); }
+figure.fig.bordered img { border: none; }
 
 /* Side-by-side figures (legacy; most figures now use .figrow) */
 .fig-row {
@@ -747,12 +750,13 @@ figure.fig.bordered img { border: 1px solid var(--line-soft); }
 .figrow.figfull .figbody p { max-width: 72ch; }
 
 .figmedia {
+  /* Transparent-background figures dissolve into the page; the dark theme
+     re-adds a light mat in themes.css for legibility. */
   margin: 0;
-  background: var(--bg-elev);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 1.1rem;
-  box-shadow: var(--shadow-soft);
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
 }
 .figmedia img {
   display: block;
@@ -761,7 +765,7 @@ figure.fig.bordered img { border: 1px solid var(--line-soft); }
   margin: 0 auto;
   border-radius: var(--radius-sm);
 }
-.figmedia.bordered img { border: 1px solid var(--line-soft); }
+.figmedia.bordered img { border: none; }
 .figmedia .figcap {
   margin: 0.8rem 0.2rem 0.1rem;
   font-size: 0.82rem;
@@ -855,7 +859,8 @@ figure.hero-fig img {
   max-width: min(100%, 1200px);
   width: 100%;
   margin: 0 auto;
-  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.08));
+  /* transparent background — no drop-shadow, so it sits flush in the page */
+  filter: none;
 }
 .teaser-cap {
   margin: 1rem auto 0;

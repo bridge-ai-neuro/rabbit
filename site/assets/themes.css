@@ -108,7 +108,10 @@ html[data-theme="dark"] .mpi-logo { filter: invert(1); opacity: 0.85; }
 html[data-theme="dark"] .figmedia,
 html[data-theme="dark"] figure.fig {
   background: #f3f1ea;
-  border-color: #e3ded3;
+  border: 1px solid #e3ded3;
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  box-shadow: var(--shadow-soft);
 }
 html[data-theme="dark"] figure.hero-fig {
   background: #f3f1ea;
