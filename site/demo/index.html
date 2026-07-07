@@ -88,12 +88,13 @@
     -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 40%, #000 100%);
     mask-image: linear-gradient(180deg, transparent 0, #000 40%, #000 100%); }
   #caption.show { opacity:1; }
-  /* Tiny disclaimer under the transcript; fades in/out with the caption. */
+  /* Tiny disclaimer under the transcript zone. Always visible (not tied to the
+     caption), with its own subtle chip so it stays readable over the brain. */
   #capnote { position:absolute; left:50%; bottom:11px; transform:translateX(-50%);
-    width:78%; max-width:560px; text-align:center; pointer-events:none;
-    font-size:10.5px; line-height:1.3; color:rgba(255,255,255,.72);
-    text-shadow:0 1px 2px rgba(0,0,0,.6); opacity:0; transition:opacity .25s; }
-  #view:has(#caption.show) #capnote { opacity:1; }
+    max-width:88%; text-align:center; pointer-events:none;
+    font-size:10.5px; line-height:1.3; color:rgba(255,255,255,.92);
+    background:rgba(24,26,30,.5); padding:3px 10px; border-radius:8px;
+    backdrop-filter:blur(2px); }
   a:focus-visible, button:focus-visible, select:focus-visible {
     outline:2px solid var(--steel); outline-offset:2px; border-radius:6px; }
 
@@ -109,7 +110,7 @@
     #view { height:56vh; min-height:300px; }
     .panel { border-left:0; border-top:1px solid var(--line); }
     #caption { width:90%; font-size:14px; }
-    #capnote { width:90%; font-size:10px; }
+    #capnote { max-width:92%; font-size:10px; }
   }
 </style>
 </head>
