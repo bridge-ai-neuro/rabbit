@@ -13,19 +13,22 @@
    overriding the base Paul-Tol hues below cascades to the whole page.
    ============================================================================ */
 
-/* ─── LIGHT (refined) ─── crisper ink, darker muted text, cleaner neutrals ──── */
+/* ─── LIGHT (clean white) ─── near-pure white, neutral greys, warm-dark ink ────
+   Deliberately NOT beige: the warm/paper feel lives in the MODERATE theme. Light
+   is a clean white so the (now transparent) white-authored figures blend, and the
+   hero no longer reads warmer than the body. Ink stays warm-dark for softness. */
 html[data-theme="light"] {
   color-scheme: light;
-  --bg:        #fcfcf9;
+  --bg:        #fdfdfd;   /* body: near-pure white, neutral */
   --bg-elev:   #ffffff;
-  --bg-soft:   #f4f3ee;
-  --bg-code:   #f5f4ef;
-  --bg-band:   #f1f1ed;
+  --bg-soft:   #f4f5f5;   /* hero gradient + formula boxes: faint cool-neutral, was warm #f4f3ee */
+  --bg-code:   #f4f5f5;
+  --bg-band:   #eef0f0;   /* stat band */
   --ink:       #1b1a18;
   --ink-soft:  #423f39;
   --ink-mute:  #6f6b62;   /* darker than the original #7d7972 for legibility */
-  --line:      #dad8d2;
-  --line-soft: #e9e7e1;
+  --line:      #dcdcdc;   /* neutral grey hairline, was warm #dad8d2 */
+  --line-soft: #e9e9e9;
 }
 
 /* ─── MODERATE (warm sepia) ─── cream paper, dark-brown ink, low blue light ─── */

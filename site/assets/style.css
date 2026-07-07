@@ -87,7 +87,7 @@ nav.top {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(250,249,246,0.96);
+  background: rgba(253,253,253,0.96);   /* neutral near-white (light); moderate/dark override in themes.css */
   backdrop-filter: saturate(160%) blur(8px);
   -webkit-backdrop-filter: saturate(160%) blur(8px);
   border-bottom: 1px solid var(--line-soft);
@@ -199,7 +199,7 @@ nav.top .pill-link:hover { background: var(--ink); color: var(--bg); border-colo
    hero, and a thin steel→wine line along its bottom edge tracks page progress. */
 nav.top { transition: background-color 200ms ease, box-shadow 200ms ease; }
 nav.top.scrolled {
-  background: rgba(250, 249, 246, 0.985);
+  background: rgba(253, 253, 253, 0.985);
   box-shadow: 0 1px 0 var(--line-soft), 0 6px 20px rgba(0, 0, 0, 0.07);
 }
 
