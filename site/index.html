@@ -10,7 +10,7 @@
 (function(){try{var t=localStorage.getItem('rabbit-theme');if(t!=='light'&&t!=='moderate'&&t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
 <title>RABBiT — Rapidly Adaptive BOLD Foundation Model via Brain-Tuning</title>
-<meta name="description" content="A foundation model for language-evoked brain activity. Predicts new participants' speech-elicited fMRI responses zero-shot and adapts to individuals in ~10 minutes with three orders of magnitude fewer parameters than voxel-wise ridge.">
+<meta name="description" content="A foundation model for speech- and language-evoked brain activity. From audio alone it predicts a new listener's fMRI zero-shot; with ~10 minutes of their fMRI it also recovers what's individual to them, using ~1000× fewer parameters than per-subject ridge.">
 <!-- Social/sharing + canonical. If you move to a custom domain, update the
      absolute URLs below (and sitemap.xml / robots.txt) to the new origin. -->
 <link rel="canonical" href="https://bridge-ai-neuro.github.io/rabbit/">
@@ -21,7 +21,7 @@
 <meta property="og:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="RABBiT — Speech-to-fMRI Foundation Model">
-<meta name="twitter:description" content="Predicts a new person's speech-evoked fMRI from audio alone — zero-shot, adapts in ~10 min. Try the live in-browser demo.">
+<meta name="twitter:description" content="Predicts a new person's speech-evoked fMRI from audio alone, zero-shot, and adapts in ~10 min. Try the live in-browser demo.">
 <meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
 <link rel="stylesheet" href="assets/style.css?v=10">
 <link rel="stylesheet" href="assets/themes.css?v=3">
@@ -95,7 +95,7 @@
         <p class="subtitle">A foundation model for speech- and language-evoked brain activity that enables accurate zero-shot and few-shot prediction.</p>
 
         <p class="one-liner">
-          Foundation models like CLIP were a breakthrough: prediction became effortless — strong zero-shot on inputs they were never trained on, fast few-shot from a few examples. Brain encoding never had this: every participant needed their own fitted model. RABBiT is that foundation model for speech- and language-evoked fMRI. Zero-shot, from audio alone, it predicts the response listeners <em>share</em> — beating the <strong>state-of-the-art billion-parameter</strong> model while light enough to run in <strong>real time in a browser</strong>. Few-shot, <strong>~10 minutes</strong> of a person's data adds what's <em>individual</em> to them — more accurate than standard per-person methods, at <strong>1000&times; fewer parameters</strong>. We validated it across <strong>324</strong> unseen participants in <strong>16 studies</strong>, and used it to replicate canonical findings in language neuroscience. Now it's public — try it live, right here. :D
+          Foundation models like CLIP transformed AI by separating what is shared from what is task-specific: strong zero-shot prediction, then rapid adaptation from only a few examples. Brain encoding never had this. Every new participant required collecting fMRI and fitting a new model. RABBiT changes that. It is a foundation model for speech- and language-evoked fMRI that supports both zero-shot prediction and efficient few-shot personalization within the same architecture. From audio alone, it predicts the brain response <em>shared</em> across listeners, outperforming the <strong>state-of-the-art billion-parameter</strong> multimodal foundation model in language regions while remaining compact enough to <strong>run interactively in a browser</strong>. With only <strong>~10 minutes</strong> of a person's own fMRI, it learns a tiny subject-specific correction that outperforms standard participant-specific methods using <strong>~1000&times; fewer trainable parameters</strong>. We validated RABBiT on <strong>324</strong> unseen participants across <strong>16 held-out studies</strong> and showed that it reproduces canonical findings from language neuroscience. Now it's public. Try it live, right here. :D
         </p>
 
         <div class="authors">
@@ -147,7 +147,7 @@
         </div>
         <div class="stat">
           <div class="v">10<span class="unit">&nbsp;min</span></div>
-          <div class="l">to adapt to a new person</div>
+          <div class="l">to adapt to an individual</div>
         </div>
         <div class="stat">
           <div class="v">1000<span class="unit">×</span></div>
@@ -162,9 +162,9 @@
     <figure class="hero-fig">
       <img loading="eager" decoding="async" width="1200" height="812" src="assets/teaser.png?v=3" alt="RABBiT teaser: zero-shot and few-shot transfer regimes across 324 participants">
       <figcaption class="teaser-cap">
-        <strong>No data from the participant (zero-shot):</strong> audio in, predicted speech-evoked fMRI out — for any new person, with nothing recorded from them.
+        <strong>No fMRI (zero-shot):</strong> audio in (even speech the model never trained on), predicted group-level fMRI out: the response shared across listeners.
         &nbsp;·&nbsp;
-        <strong>A few minutes of their data (few-shot):</strong> ~10 minutes of that person listening tunes a tiny per-person adjustment, sharpening the prediction where individual brains differ most.
+        <strong>A few minutes of fMRI (few-shot):</strong> ~10 minutes of the person listening tunes a tiny subject-specific correction, sharpening the prediction where individual brains differ most.
       </figcaption>
     </figure>
   </div>
@@ -176,32 +176,32 @@
     <span class="folio" aria-hidden="true">01</span>
     <span class="section-tag">Two ways to use one model</span>
   </div>
-  <h2>How much do you know about the listener?</h2>
+  <h2>How much fMRI do you have?</h2>
   <p class="lede">
-    One fact about the brain sets up everything below: speech-evoked responses are <em>shared across people</em> in auditory cortex, but become <em>increasingly individual</em> in higher-order language regions. That is why a single model can serve two very different situations.
+    Both regimes below address the same challenge: a new listener hearing speech the model has never encountered. The only difference is how much of that listener's fMRI is available. One model can support both because speech-evoked brain responses contain two kinds of information: reliable structure <em>shared</em> across listeners, and <em>individual</em> differences that become increasingly important in higher-order language regions.
   </p>
 
   <div class="pillars">
     <article class="pillar zero">
-      <span class="tag">Zero-shot &middot; no data</span>
-      <h3 class="title">A brand-new participant</h3>
+      <span class="tag">Zero-shot &middot; no fMRI</span>
+      <h3 class="title">New speech, no brain data</h3>
       <p class="claim">
-        Nothing recorded from this person. Audio goes in; their speech-evoked brain response comes out.
+        No fMRI from this person at all. Audio goes in (even speech the model never trained on), and the response <em>shared</em> across listeners comes out.
       </p>
       <div class="claim-bullets">
-        <div class="bullet"><span class="dot zero"></span>Predicts the cortical response for <strong>any new listener</strong>, with zero data from them</div>
-        <div class="bullet"><span class="dot zero"></span>Captures <strong>auditory and core language cortex</strong> — the parts of the response people share</div>
+        <div class="bullet"><span class="dot zero"></span>Predicts the <strong>shared brain response</strong> to new speech, for entirely new listeners</div>
+        <div class="bullet"><span class="dot zero"></span>Recovers <strong>group-level auditory and language responses</strong> directly from audio</div>
       </div>
     </article>
     <article class="pillar few">
-      <span class="tag">Few-shot &middot; a few minutes</span>
-      <h3 class="title">A little of their own data</h3>
+      <span class="tag">Few-shot &middot; ~10 minutes</span>
+      <h3 class="title">The same, plus a little of their fMRI</h3>
       <p class="claim">
-        Have the person listen for ~10 minutes. RABBiT tunes a small per-person adjustment and re-predicts.
+        Same new listener, same novel speech, now with <strong>~10 minutes</strong> of their own fMRI. RABBiT learns a compact subject-specific correction that captures what makes their brain <em>unique</em>.
       </p>
       <div class="claim-bullets">
-        <div class="bullet"><span class="dot few"></span><strong>~10 minutes</strong> of that person listening is enough to adapt</div>
-        <div class="bullet"><span class="dot few"></span>Sharpens exactly where brains differ most — the <strong>higher-order language network</strong></div>
+        <div class="bullet"><span class="dot few"></span>No <strong>voxel-wise</strong> model to fit, only a small subject-specific correction</div>
+        <div class="bullet"><span class="dot few"></span>Improves exactly where brains differ most: <strong>higher-order language cortex</strong></div>
       </div>
     </article>
   </div>
@@ -215,7 +215,7 @@
   </div>
   <h2>It organizes like a brain.</h2>
   <p class="lede">
-    Before asking how <em>accurately</em> RABBiT predicts, the first question is whether it predicts like a brain at all. It does. Two textbook signatures of the human language network fall straight out of its predictions on held-out data — with no anatomical supervision, and without ever being trained on these contrasts. That is what makes the accuracy in the next two sections worth trusting.
+    Accuracy alone is not enough. If RABBiT is learning meaningful language representations rather than simply fitting data, it should reproduce established properties of the human language network. It does, both from its predictions and from the representations it learns internally.
   </p>
 
   <div class="figrow reverse">
@@ -226,8 +226,8 @@
     <div class="figbody">
       <span class="figref">A classic localizer</span>
       <h3 class="figtitle">The language network, reproduced.</h3>
-      <p>Give RABBiT the standard intelligibility contrast — the <em>same</em> speech, intact versus acoustically degraded — and difference its <em>predicted</em> BOLD, and a <strong>left-lateralized fronto-temporo-parietal language network</strong> emerges: inferior frontal, lateral temporal, inferior-parietal&nbsp;/&nbsp;angular.</p>
-      <p>Early auditory cortex, which responds to <em>both</em>, largely cancels — exactly as it should. RABBiT was never trained on this contrast or these stimuli.</p>
+      <p>Present RABBiT with the standard intelligibility contrast (intact speech versus acoustically matched but unintelligible speech) and subtract the predicted responses. A <strong>left-lateralized fronto-temporo-parietal language network</strong> emerges: frontal, lateral temporal, inferior-parietal and angular regions.</p>
+      <p>Early auditory cortex, which responds similarly to both conditions, largely cancels, exactly as expected. RABBiT was never trained on this contrast or on any controlled localizer.</p>
     </div>
   </div>
 
@@ -239,13 +239,13 @@
     <div class="figbody">
       <span class="figref">Emergent hierarchy</span>
       <h3 class="figtitle">It rebuilds the processing stream.</h3>
-      <p>Each region has a learned representation inside the model. Stepping from <em>primary auditory cortex</em> to the most similar not-yet-visited region traces the canonical path — <strong>primary&nbsp;→&nbsp;belt auditory&nbsp;→&nbsp;STG&nbsp;/&nbsp;STS&nbsp;→&nbsp;parietal and frontal</strong> language regions.</p>
-      <p>The model was never told this anatomical ordering; that it falls out of representational similarity alone is the non-trivial part.</p>
+      <p>Each brain region is represented by a learned query inside the model. Starting from primary auditory cortex, repeatedly moving to the most similar not-yet-visited region reconstructs the canonical progression from primary auditory cortex through belt regions, STG&nbsp;/&nbsp;STS, temporal association cortex, and finally <strong>parietal and frontal language regions</strong>.</p>
+      <p>The model is never given this ordering. It emerges purely from the learned representational geometry.</p>
     </div>
   </div>
 
   <p class="kicker-note">
-    Together these make RABBiT usable as a <strong>computational model organism</strong> for language: a stand-in brain you can probe, contrast, and localize in — at the scale of hundreds of participants, without scanning each one. The next two sections measure how accurately it predicts those brains: first with <strong>no data</strong> from the person, then with <strong>~10&nbsp;minutes</strong> of it.
+    Together these make RABBiT more than a predictive model. It becomes a <strong>computational model organism</strong> for speech and language, an in-silico brain that can be localized, contrasted, and probed without collecting new fMRI. The next two sections ask how accurately it predicts brain responses: first without any additional fMRI, then with only <strong>~10&nbsp;minutes</strong> of participant-specific data.
   </p>
 </section>
 
@@ -253,11 +253,11 @@
 <section class="section" id="zeroshot">
   <div class="chapter">
     <span class="folio" aria-hidden="true">03</span>
-    <span class="section-tag">Result&nbsp;2 · Zero-shot — no data from the person</span>
+    <span class="section-tag">Result&nbsp;2 · Zero-shot: no fMRI from the person</span>
   </div>
-  <h2>A new person's brain, from speech alone.</h2>
+  <h2>The shared response, from speech alone.</h2>
   <p class="lede">
-    The hardest case: a participant RABBiT has <strong>never seen</strong>, with <strong>nothing recorded</strong> from them. Audio goes in; their speech-evoked fMRI comes out. Below — first the prediction on one held-out listener, then how it stacks up against the strongest alternatives across all <strong>324</strong>.
+    The hardest setting: <strong>no fMRI</strong> from this listener, and speech the model has <strong>never encountered</strong>. From audio alone, RABBiT predicts the reliable group-level response <em>shared</em> across listeners. Below, we first show one held-out participant, then summarize performance across all <strong>324</strong> unseen participants.
   </p>
 
   <div class="figrow reverse">
@@ -267,8 +267,8 @@
     </figure>
     <div class="figbody">
       <span class="figref">Zero-shot accuracy</span>
-      <h3 class="figtitle">A new brain, from audio alone.</h3>
-      <p>With <strong>nothing recorded</strong> from this person, RABBiT already predicts their speech-evoked response across <strong>auditory cortex and the temporal language belt</strong> — the parts of the response that people share.</p>
+      <h3 class="figtitle">Validated across multiple novel studies and stimuli.</h3>
+      <p>Without any retraining, RABBiT already predicts speech-evoked activity across <strong>auditory cortex and the temporal language network</strong>, the parts of the response that are reliably shared across people.</p>
     </div>
   </div>
 
@@ -280,8 +280,7 @@
     <div class="figbody">
       <span class="figref">vs a billion-parameter model</span>
       <h3 class="figtitle">Ahead of a far larger model.</h3>
-      <p>Head-to-head with <strong>TRIBEv2</strong>, a billion-parameter multimodal foundation model, RABBiT's zero-shot edge (blue) concentrates across <strong>auditory and temporal language cortex</strong> — the cortex that carries the speech-evoked signal.</p>
-      <p>And it gets there from only <strong>six training brains</strong>, against TRIBEv2's far larger training set.</p>
+      <p>Compared with <strong>TRIBEv2</strong>, a billion-parameter multimodal brain foundation model, RABBiT's largest gains concentrate in <strong>auditory and temporal language cortex</strong>, despite being trained on only <strong>six participants</strong> and predicting at <strong>four times the cortical resolution</strong>.</p>
     </div>
   </div>
 
@@ -293,8 +292,8 @@
     <div class="figbody">
       <span class="figref">Region by region</span>
       <h3 class="figtitle">The advantage, quantified.</h3>
-      <p>Region by region, RABBiT's biggest gains are in auditory and temporal language cortex, and it leads in several frontal regions (insula&nbsp;/&nbsp;FOp, temporal pole, mPFC). The two are comparable elsewhere; precuneus&nbsp;/&nbsp;PCC is the one region where TRIBEv2 significantly leads.</p>
-      <p>Visual and motor regions sit near chance for both — expected for an audio-only model.</p>
+      <p>Region by region, RABBiT's largest gains occur in auditory cortex, STG&nbsp;/&nbsp;STS, temporal pole, insula&nbsp;/&nbsp;FOp, and mPFC. The two models perform similarly across much of higher-order language cortex, with precuneus&nbsp;/&nbsp;PCC the one region where TRIBEv2 significantly leads.</p>
+      <p>Visual and motor regions remain near chance for both, as expected for an audio-only model.</p>
     </div>
   </div>
 
@@ -304,10 +303,10 @@
       <figcaption class="figcap"><span class="num">Fig 6</span>$r_\text{group}$ across bilateral language ROIs · Narratives &amp; Le&nbsp;Petit&nbsp;Prince.</figcaption>
     </figure>
     <div class="figbody">
-      <span class="figref">vs the inter-subject ceiling</span>
-      <h3 class="figtitle">It reaches the inter-subject ceiling.</h3>
-      <p><strong>RABBiT (blue) reaches the leave-one-out consistency ceiling on Narratives and surpasses it on Le&nbsp;Petit&nbsp;Prince</strong> — on par with a 68&nbsp;M-parameter per-subject readout, at 12.9&nbsp;M. The 1&nbsp;B-parameter TRIBEv2 and the linear baseline sit below.</p>
-      <p>This holds across all <strong>324 held-out participants in 16 studies</strong>, not just the listener above. Gray dots are peer inter-subject consistency; the dashed line is the ceiling.</p>
+      <span class="figref">vs the inter-subject consistency measure (ISC)</span>
+      <h3 class="figtitle">It reliably reaches or exceeds the ISC.</h3>
+      <p>Across <strong>324</strong> unseen participants, RABBiT reaches, and on one cohort slightly exceeds, the <strong>leave-one-out inter-subject consistency</strong> estimate, indicating that its remaining error is approaching the reliability of the target itself. It matches a much larger per-subject readout while remaining substantially smaller, and both the billion-parameter TRIBEv2 and the linear baseline remain below this reference.</p>
+      <p>Gray dots show peer inter-subject consistency; the dashed line is the leave-one-out consistency estimate.</p>
     </div>
   </div>
 </section>
@@ -316,11 +315,11 @@
 <section class="section" id="fewshot">
   <div class="chapter">
     <span class="folio" aria-hidden="true">04</span>
-    <span class="section-tag">Result&nbsp;3 · Few-shot — a few minutes of their data</span>
+    <span class="section-tag">Result&nbsp;3 · Few-shot: a few minutes of fMRI data</span>
   </div>
-  <h2>Ten minutes sharpens the rest.</h2>
+  <h2>Ten minutes completes the picture.</h2>
   <p class="lede">
-    Zero-shot captures what brains <em>share</em>. The parts that make a brain <em>individual</em> — the higher-order language network — need a little of that person's own data. About <strong>~10&nbsp;minutes</strong> of them listening is enough for RABBiT to tune a small per-person adjustment and re-predict.
+    Zero-shot predicts what listeners <em>share</em>. The parts that make a brain <em>individual</em>, primarily higher-order language regions, require only a small amount of participant-specific data. About <strong>10 minutes</strong> is enough for RABBiT to learn that remaining structure.
   </p>
 
   <div class="figrow reverse">
@@ -331,20 +330,19 @@
     <div class="figbody">
       <span class="figref">Few-shot accuracy</span>
       <h3 class="figtitle">Sharper across the language network.</h3>
-      <p>A small per-person adjustment, tuned on <strong>~10&nbsp;minutes</strong> of their own listening, makes agreement <strong>rise and spread through the wider language network</strong>. Same model, same scale as Fig&nbsp;3 — red marks the few-shot regime, not a different range.</p>
+      <p>A compact subject-specific correction, learned from <strong>~10&nbsp;minutes</strong> of listening, substantially improves prediction across the language network. The model itself does not change; only the small personalization pathway is updated.</p>
     </div>
   </div>
 
   <div class="figrow">
     <figure class="figmedia bordered">
       <img loading="lazy" decoding="async" width="1447" height="1011" src="assets/brain_delta_21styear_C400_fewshot_focus_with_legend.png?v=2" alt="Cortical map of few-shot minus zero-shot correlation for the same listener: red marks improvement across higher-order language regions, auditory cortex unchanged">
-      <figcaption class="figcap"><span class="num">Fig 8</span>Δ<em>r</em> = few-shot − zero-shot, same listener, −0.1 to +0.1 · red ⇒ improved by the 10-min adjustment, blue ⇒ reduced.</figcaption>
+      <figcaption class="figcap"><span class="num">Fig 8</span>Δ<em>r</em> = few-shot − zero-shot, same listener, −0.1 to +0.1 · red ⇒ improved by the 10-min correction, blue ⇒ reduced.</figcaption>
     </figure>
     <div class="figbody">
       <span class="figref">Where ten minutes lands</span>
       <h3 class="figtitle">The gain lands on the language network.</h3>
-      <p>Differencing the two maps directly: the ten-minute adjustment <strong>improves the prediction (red)</strong> across <strong>higher-order language cortex</strong> — lateral frontal, temporal and inferior-parietal regions — exactly the cortex that differs most between individuals.</p>
-      <p>Auditory cortex, already captured zero-shot, is left essentially unchanged.</p>
+      <p>Comparing few-shot to zero-shot directly shows that almost all of the improvement occurs in <strong>higher-order language cortex</strong> (frontal, inferior-parietal, medial frontal, and precuneus&nbsp;/&nbsp;PCC regions), while auditory cortex, already well captured zero-shot, changes very little.</p>
     </div>
   </div>
 
@@ -355,8 +353,8 @@
     </figure>
     <div class="figbody">
       <span class="figref">Every region improves</span>
-      <h3 class="figtitle">Every higher-order region improves.</h3>
-      <p>Across the regions that differ most between individuals, the ten-minute adjustment lifts accuracy <strong>everywhere it is measured</strong> — all at p&lt;0.01 or better (paired one-sided <em>t</em>-tests). Both bars are the same RABBiT model, zero-shot versus few-shot.</p>
+      <h3 class="figtitle">The gains are exactly where brains differ.</h3>
+      <p>Across the regions that vary most across individuals, the 10-minute correction <strong>significantly improves prediction</strong> throughout the language network. Both bars correspond to the same RABBiT model: before and after personalization.</p>
     </div>
   </div>
 
@@ -367,22 +365,20 @@
     </figure>
     <div class="figbody">
       <span class="figref">vs per-voxel ridge</span>
-      <h3 class="figtitle">Beats ridge — for far less.</h3>
-      <p>RABBiT's few-shot adaptation is already above its zero-shot at <strong>5&nbsp;minutes</strong> and stays above both ridge baselines through 40&nbsp;minutes.</p>
-      <p>It does this while updating <strong>~1000× fewer parameters per person</strong> (~115K vs ~10<sup>8</sup>).</p>
+      <h3 class="figtitle">Beats ridge with a far lower budget.</h3>
+      <p>RABBiT improves over its own zero-shot prediction after only <strong>5&nbsp;minutes</strong> of calibration and consistently outperforms both voxel-wise ridge baselines through 40&nbsp;minutes. It achieves this while updating only <strong>~115K parameters per participant</strong>, roughly 1000&times; fewer than voxel-wise ridge.</p>
     </div>
   </div>
 
   <div class="figrow reverse">
     <figure class="figmedia bordered">
       <img loading="lazy" decoding="async" width="1500" height="734" src="assets/per_roi_top_C400_with_direct.png?v=2" alt="Per-region percent change at 10 minutes, RABBiT few-shot vs ridge">
-      <figcaption class="figcap"><span class="num">Fig 11</span>Improvement over own zero-shot at ~10&nbsp;min · ∗∗∗ vs zero-shot.</figcaption>
+      <figcaption class="figcap"><span class="num">Fig 11</span>Improvement over own zero-shot at ~10&nbsp;min · ∗∗&nbsp;/&nbsp;∗∗∗ vs zero-shot.</figcaption>
     </figure>
     <div class="figbody">
       <span class="figref">At ten minutes</span>
-      <h3 class="figtitle">Up to 100% better, region by region.</h3>
-      <p>Relative to its <em>own</em> zero-shot, ~10&nbsp;minutes lifts IFG, supramarginal, angular, MFG&nbsp;/&nbsp;DLPFC, mPFC and precuneus&nbsp;/&nbsp;PCC by <strong>~30% to over 100%</strong> — the very regions the leave-one-out diagnostic (Fig&nbsp;15) flags as individual.</p>
-      <p>And it <em>matches</em> per-voxel ridge on the same data, at ~1000× fewer parameters.</p>
+      <h3 class="figtitle">Up to ~90% better, region by region.</h3>
+      <p>Relative to its <em>own</em> zero-shot prediction, ~10&nbsp;minutes increases performance by <strong>roughly 30 to 90%</strong> in IFG, supramarginal gyrus, angular gyrus, MFG&nbsp;/&nbsp;DLPFC, mPFC, and precuneus&nbsp;/&nbsp;PCC, the very regions identified by the model as most individual across listeners.</p>
     </div>
   </div>
 </section>
@@ -395,7 +391,7 @@
   </div>
   <h2>Inside the model.</h2>
   <p class="lede">
-    Two ideas do the work. One reads the speech stream the way cortex does — region by region. The other separates what everyone shares from what makes a brain individual, which is precisely what lets the same model serve the zero-shot and few-shot regimes above. Then two checks show which components are load-bearing, and why a few minutes of data help exactly where they do.
+    Two ideas make both transfer regimes possible. One learns how different brain regions selectively integrate information from speech. The other separates what listeners <em>share</em> from what makes each brain <em>unique</em>, allowing the same model to support both zero-shot and few-shot prediction. Then two checks show which components are load-bearing, and why a few minutes of data help exactly where they do.
   </p>
 
   <!-- ─── TBT ─────────────────────────────────────────────────────── -->
@@ -419,7 +415,7 @@
     <div class="figbody">
       <span class="figref">TBT · the readout</span>
       <h3 class="figtitle">One query per region.</h3>
-      <p>Each region's query <strong>q<sub>i</sub></strong> is the search; the brain-tuned speech features are the keys and values. The softmax weights pick <em>which moments</em> of audio matter, and their weighted sum is that region's representation <strong>z<sub>i</sub></strong>.</p>
+      <p>Each brain region learns its own query over the speech stream. Rather than pooling speech uniformly, every region selectively gathers the moments most relevant to it, producing a compact region-level representation <strong>z<sub>i</sub></strong>.</p>
     </div>
   </div>
 
@@ -430,13 +426,13 @@
   </h3>
   <p class="component-tagline">What everyone shares + what makes a brain individual.</p>
   <p>
-    Each region's response is written as a <strong>shared population subspace</strong> ($\Phi_i$) plus a small <strong>per-person deviation</strong> ($\Delta_{i,s}$). The shared part is what drives the <em>zero-shot</em> prediction for anyone; the deviation is the small, structured difference that the <em>few-shot</em> step tunes for an individual. This split is exactly why one model covers both regimes — and why ~10 minutes of data is enough to adapt.
+    Each region's response is written as a <strong>shared population subspace</strong> ($\Phi_i$) plus a small <strong>per-person deviation</strong> ($\Delta_{i,s}$). The shared part is what drives the <em>zero-shot</em> prediction for anyone; the deviation is the small, structured difference that the <em>few-shot</em> step tunes for an individual. This split is exactly why one model covers both regimes, and why ~10 minutes of data is enough to adapt.
   </p>
   <div class="formula math">
     $$\hat{y}^{(s)}_i = \pi_i(z_i) \, \Phi_i \;+\; \rho_i(z_i) \, \Delta_{i,s}$$
   </div>
   <p class="formula-legend">
-    $\Phi_i$ is the shared basis (the population response subspace for region $i$); $\Delta_{i,s}$ is the per-person deviation basis (the only part updated during few-shot); $\pi_i, \rho_i$ are small heads that read out from the region representation $z_i$.
+    $\Phi_i$ is the shared basis (the population response subspace for region $i$); $\Delta_{i,s}$ is the per-person deviation basis; $\pi_i, \rho_i$ are small heads that read out from the region representation $z_i$. Few-shot updates only $\rho_i$ (the deviation coefficients), and freezes everything else.
   </p>
 
   <div class="figrow figfull">
@@ -446,14 +442,14 @@
     </figure>
     <div class="figbody">
       <span class="figref">End to end</span>
-      <h3 class="figtitle">From clip to brain map.</h3>
-      <p>A brain-tuned speech model encodes the audio; the <strong>TBT</strong> routes it into per-region representations; the <strong>SID</strong> turns each into vertex-level fMRI — shared part for everyone, deviation part for the individual.</p>
-      <p>The whole pipeline is trained end-to-end on six participants of CNeuroMod Friends.</p>
+      <h3 class="figtitle">From speech to brain.</h3>
+      <p>A brain-tuned speech model converts audio into speech representations. The <strong>Temporal Brain Transformer</strong> routes them into region-level representations. <strong>SID</strong> then separates every prediction into a shared population response and a compact participant-specific deviation before producing high-resolution fMRI predictions.</p>
+      <p>The entire model is trained end-to-end on six participants from CNeuroMod Friends.</p>
     </div>
   </div>
 
   <!-- ─── WHY IT WORKS — ablations + diagnostic, folded into How it works ── -->
-  <h3 class="component-h">Why it works — what each piece buys you</h3>
+  <h3 class="component-h">Why it works: what each piece buys you</h3>
   <p class="component-tagline">Ablate a component, or leave a person out, and watch zero-shot accuracy move.</p>
 
   <div class="figrow reverse">
@@ -463,9 +459,8 @@
     </figure>
     <div class="figbody">
       <span class="figref">Ablations</span>
-      <h3 class="figtitle">Which pieces are load-bearing.</h3>
-      <p>Removing <em>brain-tuning</em> of the speech backbone causes the largest drop — about <strong>40%</strong> (r&nbsp;≈&nbsp;0.20&nbsp;→&nbsp;0.12); removing the <em>TBT</em> also lowers it significantly.</p>
-      <p>The decomposition matches a per-subject full-rank readout — one independent weight per voxel — at <strong>~5× fewer parameters</strong>, and wav2vec2 vs WavLM barely matters.</p>
+      <h3 class="figtitle">Which pieces matter.</h3>
+      <p><strong>Brain-tuning</strong> contributes the largest improvement in zero-shot prediction, while removing the <em>Temporal Brain Transformer</em> also significantly reduces performance. SID matches a full participant-specific readout using roughly <strong>five times fewer parameters</strong>, and replacing wav2vec2 with a much larger speech model provides little additional benefit.</p>
     </div>
   </div>
 
@@ -477,8 +472,8 @@
     <div class="figbody">
       <span class="figref">The diagnostic</span>
       <h3 class="figtitle">Why minutes help where they do.</h3>
-      <p>Early auditory cortex barely changes (~20–25%) when a person is left out — that response is <strong>shared</strong>, so zero-shot already nails it. Higher-order language regions <strong>collapse</strong> — the temporal pole by ~78%.</p>
-      <p>Those regions are <em>individual</em>: a population average can't reach them, which is exactly where the few-shot step pays off.</p>
+      <p>Leaving one listener out of the population average barely changes early auditory cortex: the response there is largely <strong>shared</strong>, so zero-shot already predicts it well. Higher-order language regions change dramatically, indicating that they contain the strongest participant-specific structure.</p>
+      <p>Those are precisely the regions where <em>few-shot</em> adaptation produces its largest gains.</p>
     </div>
   </div>
 </section>
@@ -499,7 +494,7 @@
     <a class="res res-demo" href="demo/">
       <span class="res-ico" aria-hidden="true">🧠</span>
       <span class="res-name">Live demo</span>
-      <span class="res-desc">Play a clip or speak into your mic — RABBiT predicts a held-out listener's language-network BOLD live in your browser. No server, no install.</span>
+      <span class="res-desc">Play a clip or speak into your mic, and RABBiT predicts a held-out listener's language-network BOLD live in your browser. No server, no install.</span>
       <span class="res-tag">interactive</span>
     </a>
     <a class="res" href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer">
