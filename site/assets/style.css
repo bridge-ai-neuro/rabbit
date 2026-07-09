@@ -638,7 +638,9 @@ a:focus-visible, button:focus-visible, select:focus-visible,
   background: var(--bg-soft);
   padding: 1.1rem 1.2rem;
   text-align: center;
-  font-size: 1.02rem;
+  /* Fluid: full 1.02rem on desktop; scales down on phones so the longest
+     equation fits the box instead of being clipped at the right edge. */
+  font-size: clamp(0.6rem, calc(3.2vw - 2.4px), 1.02rem);
   margin: 1rem 0 0.6rem;
   display: block;
   overflow-x: auto;
@@ -860,6 +862,7 @@ figure.hero-fig img {
   display: block;
   max-width: min(100%, 1200px);
   width: 100%;
+  height: auto;   /* preserve aspect ratio — the height="812" attr must not fix the box */
   margin: 0 auto;
   /* transparent background — no drop-shadow, so it sits flush in the page */
   filter: none;
