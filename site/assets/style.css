@@ -747,7 +747,7 @@ figure.fig.bordered img { border: none; }
    grid and span the full content width, with the explanation as a centred block
    beneath — the standard treatment for a wide diagram or a horizontal strip. */
 .figrow.figfull { display: block; margin: clamp(2.4rem, 2rem + 1.2vw, 3.4rem) 0; }
-.figrow.figfull .figmedia img { width: 100%; }
+.figrow.figfull .figmedia img { width: 86%; }
 .figrow.figfull .figbody { max-width: 72ch; margin: 1rem auto 0; }
 .figrow.figfull .figbody p { max-width: 72ch; }
 
@@ -762,11 +762,13 @@ figure.fig.bordered img { border: none; }
 }
 .figmedia img {
   display: block;
-  width: 100%;
+  width: 86%;              /* all figures dialed down ~14%; centred, aspect kept */
   height: auto;
   margin: 0 auto;
   border-radius: var(--radius-sm);
 }
+/* Fig 1 (the localizer surface) keeps its full size per design. */
+.figmedia.fig-keepsize img { width: 100%; }
 .figmedia.bordered img { border: none; }
 .figmedia .figcap {
   margin: 0.8rem auto 0.1rem;
@@ -861,7 +863,7 @@ figure.hero-fig {
 figure.hero-fig img {
   display: block;
   max-width: min(100%, 1200px);
-  width: 100%;
+  width: 80%;     /* teaser dialed down ~20% from full width; centred */
   height: auto;   /* preserve aspect ratio — the height="812" attr must not fix the box */
   margin: 0 auto;
   /* transparent background — no drop-shadow, so it sits flush in the page */
