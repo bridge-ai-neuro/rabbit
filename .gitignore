@@ -51,3 +51,21 @@ _site/
 site/assets/hero_build/
 site/demo/node_check/
 site/assets/hero_rabbit.gif
+
+# Not part of the public code release: internal dev scripts, paper source,
+# large build artifacts, and local working notes.
+scripts/_dev/
+scripts/_onnx_proto_out/
+walk_thru/
+paper/
+/main.bib
+/neurips_2026.sty
+/RABBiT_Nips26.zip
+/website_content_backup.md
+/website_copy_review.md
+
+# Live streaming demo (mic/socket + interactive brain) — not in this push;
+# the fully in-browser live demo on the website covers "live".
+src/rabbit/live/
+examples/02_live_microphone.py
+docs/live_demo.md

@@ -30,6 +30,7 @@ jobs:
       - name: Prune to a clean publish tree (~45 MB)
         run: |
           rsync -a --delete \
+            --exclude 'assets/_fig_orig/' \
             --exclude 'assets/hero_build/' \
             --exclude 'demo/node_check/' \
             --exclude 'serve.mjs' \

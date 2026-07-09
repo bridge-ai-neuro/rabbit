@@ -1,0 +1,110 @@
+# Friends shared+deviation — wav2vec2-base, 30 fs6 ROIs (paper headline).
+#
+# Required environment variables (or set via overrides):
+#   RABBIT_BASES_DIR   path to Friends_Templates_fs6/ with `average/pca_bases.npz`
+#                      and `sub-{NN}/pca_bases.npz` per subject.
+#   RABBIT_DATA_ROOT   only needed for training (the per-clip fs6 .npz files).
+#   RABBIT_AUDIO_ROOT  only needed for training (per-clip .npy waveforms).
+
+readout_type: shared_deviation
+
+backbone:
+  model_name: facebook/wav2vec2-base-960h
+  sampling_rate: 16000
+
+lora:
+  rank: 16
+  alpha: 32
+  dropout: 0.1
+
+encoder:
+  hidden_dim: 256
+  nhead: 8
+  num_layers: 2
+  dim_feedforward: 1024
+  dropout: 0.1
+  position_embedding: sine
+  max_positions: 4096
+  query_init_std: 0.05
+  readout_bias: true
+  use_self_attention: true
+
+parametric:
+  K: 100
+  bases_dir: ${RABBIT_BASES_DIR:./data/Friends_Templates_fs6}
+
+shared_deviation:
+  R: 15
+  lambda_anchor: 1.0e-3
+  mu_ortho: 0.0
+  bases_lr: 1.0e-4
+  uniform_dev_bias_rois:
+    - angular_gyrus_lh
+    - angular_gyrus_rh
+    - supramarginal_lh
+    - supramarginal_rh
+    - ifg_lh
+    - ifg_rh
+    - mfg_dlpfc_lh
+    - mfg_dlpfc_rh
+
+# Training-only fields below — inference reads `readout_type`, `backbone`,
+# `lora`, `encoder`, `parametric`, `shared_deviation`, and the subject list.
+data:
+  fmri_dir:  ${RABBIT_DATA_ROOT:./data/friends_fs6}
+  audio_dir: ${RABBIT_AUDIO_ROOT:./data/friends_stimuli}
+  subjects: ['01', '02', '03', '04', '05', '06']
+  anchor_sub: '01'
+  roi_names:
+    - aud_primary_lh
+    - aud_primary_rh
+    - aud_belt_lh
+    - aud_belt_rh
+    - stg_sts_lh
+    - stg_sts_rh
+    - temporal_pole_lh
+    - temporal_pole_rh
+    - posterior_temp_lh
+    - posterior_temp_rh
+    - angular_gyrus_lh
+    - angular_gyrus_rh
+    - supramarginal_lh
+    - supramarginal_rh
+    - ifg_lh
+    - ifg_rh
+    - mfg_dlpfc_lh
+    - mfg_dlpfc_rh
+    - mpfc_tom_lh
+    - mpfc_tom_rh
+    - precuneus_pcc_lh
+    - precuneus_pcc_rh
+    - motor_lh
+    - motor_rh
+    - insula_fop_lh
+    - insula_fop_rh
+    - visual_early_lh
+    - visual_early_rh
+    - visual_higher_lh
+    - visual_higher_rh
+
+temporal:
+  tr_length: 1.49
+  hrf_delay: 6
+  trim_start: 10
+  trim_end: 9
+
+loss:
+  type: scaled_corr
+  lambda_corr: 1.0
+  lambda_l2: 1.0
+
+training:
+  num_epochs: 30
+  batch_size: 256
+  base_lr: 1.0e-4
+  readout_lr: 1.0e-3
+  weight_decay: 1.0e-2
+  grad_clip: 1.0
+  warmup_fraction: 0.03
+  freeze_backbone_epochs: 3
+  early_stopping_patience: 5
