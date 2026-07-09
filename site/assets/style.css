@@ -1155,6 +1155,7 @@ svg.icon { width: 1em; height: 1em; vertical-align: -0.15em; }
   :root {
     --content: clamp(1240px, calc(100vw - 2 * clamp(56px, 7vw, 300px)), 1560px);
   }
+  nav.top .inner,
   .hero .container,
   .numbers-wrap,
   .section,
@@ -1172,6 +1173,7 @@ svg.icon { width: 1em; height: 1em; vertical-align: -0.15em; }
     --content: clamp(1180px, calc(100vw - 2 * clamp(48px, 5vw, 220px) - var(--pnavzone)), 1560px);
     --shell-left: calc((100vw - var(--content) - var(--pnavzone)) / 2);
   }
+  nav.top .inner,
   .hero .container,
   .numbers-wrap,
   .section,
