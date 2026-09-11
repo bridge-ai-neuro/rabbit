@@ -1,0 +1,23 @@
+/* A concise opening followed by the complete, uninterrupted research document. */
+.hero-description { color: var(--ink-soft); font-size: 18px; line-height: 1.6; max-width: 48ch; margin: 22px 0 10px; }
+.hero-hook { color: var(--ink); font-size: 18px; font-weight: 500; line-height: 1.55; max-width: 48ch; margin: 0 0 24px; }
+.hero-capabilities { list-style: none; padding: 0; margin: 0 0 28px; display: grid; gap: 18px; }
+.hero-capabilities li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 14px; align-items: start; }
+.hero-capabilities .icon { width: 25px; height: 25px; margin-top: 2px; }
+.hero-capabilities strong { display: block; font-size: 16px; line-height: 1.5; margin-bottom: 4px; }
+.hero-capabilities p { color: var(--ink-soft); font-size: 16px; line-height: 1.6; margin: 0; max-width: 48ch; }
+.continuous-page .chapter-intro { margin-top: 16px; border-top: 2px solid var(--accent); padding-top: 48px; padding-bottom: 20px; }
+.chapter-intro h2 { font-size: var(--heading-section); line-height: 1.2; font-weight: 650; letter-spacing: -0.035em; margin: 0 0 20px; }
+.continuous-page .chapter-intro + .section { border-top: 0; padding-top: 24px; }
+.continuous-page #resources { border-top-color: var(--accent); }
+.continuous-page .reading-nav a { padding-block: 9px; }
+@media (max-width: 700px) {
+  .hero-description { font-size: 17px; margin-top: 20px; }
+  .hero-hook { font-size: 17px; margin-bottom: 22px; }
+  .hero-capabilities { gap: 16px; margin-bottom: 24px; }
+  .hero-capabilities li { gap: 12px; }
+  .hero-capabilities strong { font-size: 16px; }
+  .hero-capabilities p { font-size: 15px; }
+  .chapter-intro h2 { font-size: var(--heading-section); }
+  .continuous-page .chapter-intro { padding-top: 36px; }
+}

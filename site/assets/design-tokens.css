@@ -1,0 +1,70 @@
+@font-face {
+  font-family: Inter;
+  src: url("fonts/inter-latin.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --font: Inter, "Helvetica Neue", Arial, sans-serif;
+  --bg: #ffffff;
+  --bg-elev: #ffffff;
+  --bg-soft: #f5f8fc;
+  --bg-code: #f5f8fc;
+  --ink: #202936;
+  --ink-soft: #424d5b;
+  --ink-mute: #5c697a;
+  --accent: #2c5885;
+  --accent-hover: #204467;
+  --accent-soft: #eaf1f9;
+  --line: #dce4ed;
+  --line-soft: #eaf0f5;
+  --radius: 6px;
+  --text-body: 17px;
+  --text-caption: 14px;
+  --text-detail: 15px;
+  --heading-section: clamp(30px, 3vw, 38px);
+  --heading-component: clamp(25px, 2.3vw, 28px);
+  --reading-measure: 68ch;
+  --section-space: 64px;
+  --figure-gap: 40px;
+  --figure-bg: #ffffff;
+  --figure-ink: #202936;
+  --figure-muted: #5c697a;
+  --figure-link: #2c5885;
+  --icon-filter: invert(31%) sepia(26%) saturate(1194%) hue-rotate(171deg) brightness(93%) contrast(91%);
+  font-family: var(--font);
+  font-synthesis: none;
+}
+
+.icon { display: inline-block; width: 19px; height: 19px; flex: 0 0 auto; vertical-align: middle; filter: var(--icon-filter); }
+
+@media (max-width: 700px) {
+  :root { --heading-section: 30px; --heading-component: 25px; --section-space: 40px; --figure-gap: 28px; }
+}
+
+/* Retain the existing optional reading themes within the same blue identity. */
+html[data-theme="moderate"] {
+  --bg: #f2f5fa;
+  --bg-elev: #f9fbfe;
+  --bg-soft: #eaf0f7;
+  --bg-code: #eaf0f7;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #171f2a;
+  --bg-elev: #1e2936;
+  --bg-soft: #202d3c;
+  --bg-code: #202d3c;
+  --ink: #eef3fa;
+  --ink-soft: #c4cfdd;
+  --ink-mute: #a4b3c6;
+  --accent: #9bc3ed;
+  --accent-hover: #c0dcf8;
+  --accent-soft: #293f58;
+  --line: #3b4c60;
+  --line-soft: #2d3c4e;
+  --icon-filter: invert(78%) sepia(15%) saturate(714%) hue-rotate(175deg) brightness(98%) contrast(91%);
+}

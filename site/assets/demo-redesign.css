@@ -1,0 +1,71 @@
+/* Shared white/blue presentation for the interactive demo. */
+:root { --muted: var(--ink-mute); --wine: var(--accent); --zero: var(--accent); --steel: var(--accent); --serif: var(--font); }
+body { font-family: var(--font); background: var(--bg); border-top: 3px solid var(--accent); }
+.topbar { min-height: 68px; background: var(--bg); padding-inline: 24px; border-bottom-color: var(--line); backdrop-filter: none; }
+.topbar .brand img { height: auto; width: 126px; }
+.topbar .crumb { text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--accent); }
+.topbar .back, .topbar .pill { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 5px; color: var(--accent); font-size: 13px; }
+.topbar .back:hover, .topbar .pill:hover { background: var(--bg-soft); color: var(--accent); border-color: var(--accent); }
+.topbar .icon { width: 17px; height: 17px; }
+.intro { padding: 24px 28px 20px; }
+.intro h1 { font-family: var(--font); font-size: 26px; line-height: 1.25; letter-spacing: -0.03em; }
+.intro p { font-size: 14px; line-height: 1.65; margin-top: 10px; }
+.panel { background: var(--bg-soft); }
+.panel h2 { font-size: 16px; line-height: 1.4; color: var(--ink); text-transform: none; letter-spacing: -0.01em; }
+.card { background: var(--bg-elev); border-radius: var(--radius); padding: 16px; }
+.status, .roi { font-size: 13px; }
+.note, .micstat, .hint { font-size: 12px; line-height: 1.55; }
+button, select { border-radius: 5px; min-height: 42px; }
+button.primary { background: var(--accent); border-color: var(--accent); }
+button.mic { color: var(--accent); background: var(--accent-soft); border-color: var(--line); }
+button:hover:not(:disabled) { border-color: var(--accent); }
+a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.panel-back a { color: var(--accent); border-color: var(--line); }
+#capnote { background: #ffffffed; box-shadow: none; border-radius: 5px; }
+code { background: var(--bg-soft); }
+@media (max-width: 720px) {
+  .topbar { padding-inline: 16px; gap: 8px; }
+  .topbar .brand img { width: 110px; }
+  .topbar .pill { padding: 8px; }
+  .intro { padding: 22px 20px 16px; }
+  .intro h1 { font-size: 23px; }
+}
+@media (max-width: 450px) {
+  .topbar { padding: 8px 12px; gap: 6px; }
+  .topbar .spacer { display: none; }
+  .topbar .brand { margin-right: auto; }
+  .topbar .brand img { width: 84px; }
+  .topbar .back, .topbar .pill { padding: 8px 7px; font-size: 12px; }
+  .topbar .pill .icon { display: none; }
+  .topbar .back .icon { display: none; }
+}
+
+[hidden] { display: none !important; }
+.wrap { min-height: 440px; }
+#main:focus { outline: none; }
+.card.off { opacity: 1; pointer-events: auto; }
+.note, .micstat, .hint { font-size: 13px; }
+button, select { color: var(--ink); }
+button:disabled { opacity: 1; color: var(--ink-mute); background: var(--bg-soft); border-color: var(--line); cursor: not-allowed; }
+.playback-controls { display: flex; gap: 8px; }
+.playback-controls #run { flex: 2; }
+.playback-controls #stopClip { flex: 1; }
+.clip-timeline { display: flex; align-items: center; gap: 12px; color: var(--ink-mute); font-size: 12px; font-variant-numeric: tabular-nums; }
+progress { accent-color: var(--accent); height: 6px; border: 0; border-radius: 3px; }
+.clip-timeline progress { flex: 1; min-width: 0; }
+#modelProgress { display: block; width: 100%; margin: 10px 0 16px; }
+.caption-option { display: flex; align-items: center; gap: 8px; min-height: 40px; font-size: 13px; }
+.caption-option input { width: 17px; height: 17px; accent-color: var(--accent); }
+#capnote { font-size: 12px; top: 12px; max-width: min(340px, 85%); }
+#caption { color: #202936; background: #fffffff0; }
+#brain:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.demo-error { padding: 24px; color: var(--ink-soft); }
+.skip-link { position: fixed; left: 16px; top: -100px; z-index: 100; padding: 12px 16px; background: var(--bg); color: var(--accent); border: 2px solid var(--accent); }
+.skip-link:focus { top: 10px; }
+@media (max-width: 900px) {
+  body { height: auto; min-height: 100vh; }
+  .wrap { grid-template-columns: 1fr; }
+  #view { height: 56vh; min-height: 340px; }
+  .panel { border-left: 0; border-top: 1px solid var(--line); overflow: visible; }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before { animation: none !important; transition: none !important; } }
