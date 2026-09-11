@@ -19,7 +19,7 @@ const MIME = {
   ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp",
   ".webm": "video/webm", ".mp4": "video/mp4", ".pdf": "application/pdf",
-  ".ipynb": "application/json",
+  ".ipynb": "application/json", ".bib": "text/plain; charset=utf-8", ".woff2": "font/woff2",
   ".f32": "application/octet-stream", ".i32": "application/octet-stream",
   ".onnx": "application/octet-stream", ".wasm": "application/wasm",
 };

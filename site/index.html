@@ -3,103 +3,89 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#fdfdfd">
-<!-- Set the saved/preferred theme before first paint (no flash). Part of the
-     removable theme system — see assets/themes.css. -->
+<meta name="theme-color" content="#ffffff">
+<!-- Apply the saved reading theme before first paint. Tokens are shared with
+     the demo in assets/design-tokens.css; the default is white with blue accents. -->
 <script>
 (function(){try{var t=localStorage.getItem('rabbit-theme');if(t!=='light'&&t!=='moderate'&&t!=='dark')t='light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
-<title>RABBiT — Rapidly Adaptive BOLD Foundation Model via Brain-Tuning</title>
-<meta name="description" content="A foundation model for speech- and language-evoked brain activity. From audio alone it predicts a new listener's fMRI zero-shot; with ~10 minutes of their fMRI it also recovers what's individual to them, using ~1000× fewer parameters than per-subject ridge.">
+<title>RABBiT — speech-evoked brain activity</title>
+<meta name="description" content="RABBiT predicts fMRI responses from audio, with zero-shot prediction and participant-specific adaptation.">
 <!-- Social/sharing + canonical. If you move to a custom domain, update the
      absolute URLs below (and sitemap.xml / robots.txt) to the new origin. -->
 <link rel="canonical" href="https://bridge-ai-neuro.github.io/rabbit/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bridge-ai-neuro.github.io/rabbit/">
-<meta property="og:title" content="RABBiT — Speech-to-fMRI Foundation Model">
-<meta property="og:description" content="Zero-shot prediction in 324 unseen participants, few-shot adaptation in ~10 minutes, ~1000× fewer parameters than per-subject ridge.">
-<meta property="og:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
+<meta property="og:title" content="RABBiT — speech-evoked brain activity">
+<meta property="og:description" content="RABBiT predicts fMRI responses from audio, with zero-shot prediction and participant-specific adaptation.">
+<meta property="og:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/hero_rabbit_poster.png">
+<meta property="og:image:alt" content="RABBiT predictions of speech-evoked brain activity.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="RABBiT — Speech-to-fMRI Foundation Model">
-<meta name="twitter:description" content="Predicts a new person's speech-evoked fMRI from audio alone, zero-shot, and adapts in ~10 min. Try the live in-browser demo.">
-<meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png">
-<link rel="stylesheet" href="assets/style.css?v=11">
-<link rel="stylesheet" href="assets/themes.css?v=3">
+<meta name="twitter:title" content="RABBiT — speech-evoked brain activity">
+<meta name="twitter:description" content="RABBiT predicts fMRI responses from audio, with zero-shot prediction and participant-specific adaptation.">
+<meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/hero_rabbit_poster.png">
+<meta name="twitter:image:alt" content="RABBiT audio-to-fMRI illustration with predicted cortical BOLD.">
+<link rel="stylesheet" href="assets/design-tokens.css?v=2">
+<link rel="stylesheet" href="assets/redesign.css?v=3">
+<link rel="stylesheet" href="assets/pages.css?v=3">
+<link rel="stylesheet" href="assets/continuous.css?v=4">
+<script defer src="assets/site.js?v=3"></script>
+<link rel="stylesheet" href="assets/reading.css?v=11">
+<script defer src="assets/reading.js?v=3"></script>
 <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
 <!-- KaTeX for in-page LaTeX math rendering (formulas in the architecture section) -->
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
         onload="renderMathInElement(document.body, { delimiters: [{left:'$$', right:'$$', display:true}, {left:'$', right:'$', display:false}], throwOnError: false });"></script>
 </head>
-<body>
-
-<!-- ─── Sticky top nav ──────────────────────────────────────────────── -->
-<nav class="top">
-  <div class="inner">
-    <a class="brand" href="#top" aria-label="RABBiT — home">
-      <img loading="eager" decoding="async" width="920" height="280" class="brand-lockup" src="assets/rabbit-lockup-bigeye.png" alt="RABBiT">
-    </a>
-    <div class="nav-links" id="nav-sections">
-      <a class="section-link" href="#what">Two ways to use it</a>
-      <a class="section-link" href="#foundation">A language network</a>
-      <a class="section-link" href="#zeroshot">Zero-shot</a>
-      <a class="section-link" href="#fewshot">Few-shot</a>
-      <a class="section-link" href="#how">How it works</a>
-      <a class="section-link" href="#cite">Cite</a>
-      <a class="section-link menu-only" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">Paper</a>
-      <a class="section-link menu-only" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">Code</a>
-    </div>
-    <span class="right">
-      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch colour theme" title="Theme">
-        <svg class="ti ti-light" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
-        <svg class="ti ti-moderate" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18a9 9 0 0 0 0-18z" fill="currentColor" stroke="none"/></svg>
-        <svg class="ti ti-dark" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3.2a6.6 6.6 0 0 0 9.8 9.6z"/></svg>
-      </button>
-      <a class="nav-cta" href="demo/"><span aria-hidden="true">🧠</span>&nbsp;Live demo</a>
-      <a class="pill-link" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">Paper</a>
-      <a class="pill-link" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">Code</a>
-      <button class="nav-toggle" id="navToggle" aria-label="Open section navigation"
-              aria-expanded="false" aria-controls="nav-sections"><span class="bars" aria-hidden="true"></span></button>
-    </span>
-  </div>
-  <div class="nav-progress" aria-hidden="true"></div>
+<body class="multipage home-page continuous-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<nav class="top" aria-label="Main navigation"><div class="inner">
+  <a class="brand" href="./" aria-label="RABBiT overview"><img class="brand-lockup" src="assets/rabbit-lockup-bigeye.png" width="920" height="280" alt="RABBiT"></a>
+  <div class="nav-links" id="nav-sections">
+    <a class="section-link detail-link" href="./" aria-current="page"><img class="icon " src="assets/icons/grid.svg" width="24" height="24" alt="" aria-hidden="true">Overview</a>
+    <a class="section-link" href="#results"><img class="icon " src="assets/icons/bar-chart-2.svg" width="24" height="24" alt="" aria-hidden="true">Results</a>
+    <a class="section-link" href="#how"><img class="icon " src="assets/icons/layers.svg" width="24" height="24" alt="" aria-hidden="true">Methods</a>
+    <a class="section-link" href="#resources"><img class="icon " src="assets/icons/download.svg" width="24" height="24" alt="" aria-hidden="true">Resources</a>
+    <a class="section-link menu-only" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer"><img class="icon " src="assets/icons/file-text.svg" width="24" height="24" alt="" aria-hidden="true">Paper</a>
+    <a class="section-link menu-only" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer"><img class="icon " src="assets/icons/code.svg" width="24" height="24" alt="" aria-hidden="true">Code</a></div><div class="right">
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch reading theme">
+      <img class="icon ti ti-light" src="assets/icons/sun.svg" width="24" height="24" alt="" aria-hidden="true"><img class="icon ti ti-moderate" src="assets/icons/monitor.svg" width="24" height="24" alt="" aria-hidden="true"><img class="icon ti ti-dark" src="assets/icons/moon.svg" width="24" height="24" alt="" aria-hidden="true">
+    </button>
+    <a class="nav-cta" href="demo/"><img class="icon " src="assets/icons/play-circle.svg" width="24" height="24" alt="" aria-hidden="true">Demo</a>
+    <a class="pill-link" href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer"><img class="icon " src="assets/icons/file-text.svg" width="24" height="24" alt="" aria-hidden="true">Paper</a>
+    <a class="pill-link" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer"><img class="icon " src="assets/icons/code.svg" width="24" height="24" alt="" aria-hidden="true">Code</a>
+    <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="nav-sections"><img class="icon " src="assets/icons/menu.svg" width="24" height="24" alt="" aria-hidden="true">Menu</button>
+  </div></div>
+  <progress class="page-progress" max="1" value="0" aria-label="Page reading progress" hidden></progress>
 </nav>
-
-<!-- ─── "On this page" side nav (wide screens; reserved right column) ─────── -->
-<nav class="page-nav" aria-label="On this page">
-  <p class="page-nav-title">On this page</p>
-  <ul>
-    <li><a href="#top"        style="--sec:var(--ink-mute)">Overview</a></li>
-    <li><a href="#what"       style="--sec:var(--ink-mute)">Two ways to use it</a></li>
-    <li><a href="#foundation" style="--sec:var(--teal)">A language network</a></li>
-    <li><a href="#zeroshot"   style="--sec:var(--steel)">Zero-shot</a></li>
-    <li><a href="#fewshot"    style="--sec:var(--wine)">Few-shot</a></li>
-    <li><a href="#how"        style="--sec:var(--indigo)">How it works</a></li>
-    <li><a href="#resources"  style="--sec:var(--darkgreen)">Resources</a></li>
-    <li><a href="#cite"       style="--sec:var(--ink-mute)">Cite</a></li>
-  </ul>
+<nav class="page-nav reading-nav" aria-label="On this page">
+  <ul><li><a data-reading-link href="#top"><img class="icon" src="assets/icons/grid.svg" width="24" height="24" alt="" aria-hidden="true"><span>Overview</span></a></li><li><a data-reading-link href="#what"><img class="icon" src="assets/icons/users.svg" width="24" height="24" alt="" aria-hidden="true"><span>Use cases</span></a></li><li><a data-reading-link href="#results"><img class="icon" src="assets/icons/bar-chart-2.svg" width="24" height="24" alt="" aria-hidden="true"><span>Results</span></a></li><li><a data-reading-link href="#zeroshot"><img class="icon" src="assets/icons/users.svg" width="24" height="24" alt="" aria-hidden="true"><span>Zero-shot results</span></a></li><li><a data-reading-link href="#fewshot"><img class="icon" src="assets/icons/sliders.svg" width="24" height="24" alt="" aria-hidden="true"><span>Few-shot results</span></a></li><li><a data-reading-link href="#foundation"><img class="icon" src="assets/icons/activity.svg" width="24" height="24" alt="" aria-hidden="true"><span>Neuroscience findings</span></a></li><li><a data-reading-link href="#how"><img class="icon" src="assets/icons/layers.svg" width="24" height="24" alt="" aria-hidden="true"><span>Model architecture</span></a></li><li><a data-reading-link href="#resources"><img class="icon" src="assets/icons/download.svg" width="24" height="24" alt="" aria-hidden="true"><span>Resources</span></a></li><li><a data-reading-link href="#cite"><img class="icon" src="assets/icons/file-text.svg" width="24" height="24" alt="" aria-hidden="true"><span>Citation</span></a></li></ul>
+  <a class="side-demo" href="demo/"><img class="icon" src="assets/icons/play-circle.svg" width="24" height="24" alt="" aria-hidden="true"><span><strong>Explore the demo</strong><small>Listen to speech and view predicted brain responses.</small></span></a>
 </nav>
-
-<!-- ─── HERO ────────────────────────────────────────────────────────── -->
+<nav class="mobile-index" aria-label="On this page"><details id="sectionPicker"><summary><img class="icon" src="assets/icons/layers.svg" width="20" height="20" alt="" aria-hidden="true"><span data-current-section>Overview</span><img class="icon" src="assets/icons/chevron-down.svg" width="20" height="20" alt="" aria-hidden="true"></summary><ul><li><a data-reading-link href="#top"><img class="icon" src="assets/icons/grid.svg" width="24" height="24" alt="" aria-hidden="true"><span>Overview</span></a></li><li><a data-reading-link href="#what"><img class="icon" src="assets/icons/users.svg" width="24" height="24" alt="" aria-hidden="true"><span>Use cases</span></a></li><li><a data-reading-link href="#results"><img class="icon" src="assets/icons/bar-chart-2.svg" width="24" height="24" alt="" aria-hidden="true"><span>Results</span></a></li><li><a data-reading-link href="#zeroshot"><img class="icon" src="assets/icons/users.svg" width="24" height="24" alt="" aria-hidden="true"><span>Zero-shot results</span></a></li><li><a data-reading-link href="#fewshot"><img class="icon" src="assets/icons/sliders.svg" width="24" height="24" alt="" aria-hidden="true"><span>Few-shot results</span></a></li><li><a data-reading-link href="#foundation"><img class="icon" src="assets/icons/activity.svg" width="24" height="24" alt="" aria-hidden="true"><span>Neuroscience findings</span></a></li><li><a data-reading-link href="#how"><img class="icon" src="assets/icons/layers.svg" width="24" height="24" alt="" aria-hidden="true"><span>Model architecture</span></a></li><li><a data-reading-link href="#resources"><img class="icon" src="assets/icons/download.svg" width="24" height="24" alt="" aria-hidden="true"><span>Resources</span></a></li><li><a data-reading-link href="#cite"><img class="icon" src="assets/icons/file-text.svg" width="24" height="24" alt="" aria-hidden="true"><span>Citation</span></a></li></ul></details></nav>
+<main id="main" tabindex="-1">
 <header class="hero" id="top">
   <div class="container">
-    <div class="hero-grid">
+    <div class="hero-grid" data-scroll-scene>
 
       <!-- LEFT COLUMN — text + links -->
       <div class="hero-text">
-        <h1 class="hero-title">
-          <img loading="eager" decoding="async" width="920" height="280" class="hero-lockup" src="assets/rabbit-lockup-bigeye.png" alt="RABBiT">
-        </h1>
+        <h1 class="hero-title">A foundation model for speech-evoked <span>brain activity.</span></h1>
 
-        <p class="subtitle">A foundation model for speech- and language-evoked brain activity that enables accurate zero-shot and few-shot prediction.</p>
-
-        <p class="one-liner">
-          Foundation models like CLIP were a breakthrough: prediction became effortless &mdash; strong zero-shot on inputs they were never trained on, fast few-shot from a few examples. Brain encoding never had this: every participant needed their own fitted model. RABBiT is that foundation model for speech- and language-evoked fMRI. Zero-shot, from audio alone, it predicts the response listeners <em>share</em> &mdash; beating the <strong>state-of-the-art billion-parameter</strong> model while light enough to <strong>run in real time in a browser</strong>. Few-shot, <strong>~10 minutes</strong> of a person's data adds what's individual to them &mdash; more accurate than standard per-person methods, at <strong>1000&times; fewer parameters</strong>. We validated it across <strong>324</strong> unseen participants in <strong>16 studies</strong>, and used it to replicate canonical findings in language neuroscience. Now it's public &mdash; try it live, right here. :D
-        </p>
+        <p class="hero-description">RABBiT predicts speech- and language-evoked fMRI responses directly from audio.</p>
+        <p class="hero-hook">One model captures shared brain responses and adapts to individual subjects.</p>
+        <ul class="hero-capabilities" aria-label="RABBiT capabilities and findings" role="list">
+          <li><img class="icon" src="assets/icons/users.svg" width="24" height="24" alt="" aria-hidden="true"><div><strong>Zero-shot prediction</strong><p>Population-level responses to speech, without fMRI.</p></div></li>
+          <li><img class="icon" src="assets/icons/sliders.svg" width="24" height="24" alt="" aria-hidden="true"><div><strong>Few-shot adaptation</strong><p>Personalize to a novel subject with a few minutes of audio and fMRI.</p></div></li>
+          <li><img class="icon" src="assets/icons/bar-chart-2.svg" width="24" height="24" alt="" aria-hidden="true"><div><strong>Outperforms state of the art</strong><p>Better brain alignment in speech and language regions.</p></div></li>
+          <li><img class="icon" src="assets/icons/activity.svg" width="24" height="24" alt="" aria-hidden="true"><div><strong>Language neuroscience</strong><p>Reproduce language findings in neuroscience.</p></div></li>
+        </ul>
 
         <div class="authors">
-          <strong>Omer Moussa</strong> &nbsp;·&nbsp;
+          <strong>Omer Moussa</strong> and
           <strong>Mariya Toneva</strong>
         </div>
         <div class="affiliations">
@@ -108,613 +94,420 @@
         </div>
 
         <div class="links">
-          <a class="cta-demo" href="demo/"><span class="ico" aria-hidden="true">🧠</span> Try it live<span class="cta-arrow" aria-hidden="true">→</span></a>
-          <a href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer" title="Paper PDF on arXiv"><span class="ico" aria-hidden="true">📄</span> Paper (PDF)</a>
-          <a class="secondary" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer" title="arXiv preprint"><span class="ico" aria-hidden="true">🗒️</span> arXiv</a>
-          <a class="secondary" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer" title="Source code on GitHub"><span class="ico" aria-hidden="true">⌗</span> Code</a>
-          <a class="secondary" href="https://github.com/bridge-ai-neuro/rabbit/blob/main/notebooks/demo.ipynb" target="_blank" rel="noopener noreferrer" title="Demo notebook on GitHub"><span class="ico" aria-hidden="true">📓</span> Demo notebook</a>
-        </div>
+          <a class="primary" href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer"><img class="icon" src="assets/icons/file-text.svg" width="20" height="20" alt="" aria-hidden="true">Read the paper</a>
+          <a class="cta-demo" href="demo/"><img class="icon" src="assets/icons/play-circle.svg" width="20" height="20" alt="" aria-hidden="true">Explore demo</a>
+          <a href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer"><img class="icon" src="assets/icons/code.svg" width="20" height="20" alt="" aria-hidden="true">Code</a>
+          </div>
       </div>
 
       <!-- RIGHT COLUMN — real RABBiT inference: audio + transcript → model →
            predicted BOLD on both hemispheres (21styear narrative, demo model). -->
-      <div class="hero-anim">
-        <video class="hero-video" autoplay loop muted playsinline preload="metadata"
+      <figure class="hero-anim">
+        <video class="hero-video" loop muted playsinline controls preload="none"
                poster="assets/hero_rabbit_poster.png?v=4"
-               aria-label="The RABBiT model hears a passage of the 21st Year narrative and predicts the fMRI BOLD response across both cortical hemispheres, shown rotating; the audio waveform, live transcript, and predicted brain activity update together.">
+               aria-label="Pre-rendered, sped-up RABBiT predictions for the 21st Year narrative. The waveform, display-only transcript, and predicted cortical BOLD are shown together; transcript text is not a model input.">
           <source src="assets/hero_rabbit.webm?v=4" type="video/webm">
           <source src="assets/hero_rabbit.mp4?v=4" type="video/mp4">
           <!-- Fallback for browsers without <video>: the poster, not a heavy GIF. -->
           <img src="assets/hero_rabbit_poster.png?v=4" width="919" height="1040" decoding="async"
                alt="RABBiT predicting fMRI BOLD from speech, both cortical hemispheres">
         </video>
-      </div>
+        <button class="video-replay" type="button" hidden aria-label="Replay the pre-rendered, sped-up animation">Replay animation</button>
+        <p class="video-error" role="status" hidden>Animation unavailable. <a href="assets/hero_rabbit.mp4?v=4">Open the video</a> or <a href="demo/">explore the demo</a>.</p>
+      </figure>
 
     </div><!-- /.hero-grid -->
   </div>
 
-  <!-- BY THE NUMBERS — now ABOVE the teaser figure, inside the hero -->
-  <div class="numbers-wrap">
-    <div class="numbers" aria-label="Key numbers">
-      <div class="row">
-        <div class="stat">
-          <div class="v">6&thinsp;<span class="unit">→</span>&thinsp;324</div>
-          <div class="l">trained on / predicts</div>
-        </div>
-        <div class="stat">
-          <div class="v">16</div>
-          <div class="l">held-out studies</div>
-        </div>
-        <div class="stat">
-          <div class="v">10<span class="unit">&nbsp;min</span></div>
-          <div class="l">to adapt to an individual</div>
-        </div>
-        <div class="stat">
-          <div class="v">1000<span class="unit">×</span></div>
-          <div class="l">fewer params than ridge</div>
-        </div>
-      </div>
+</header>
+<section class="use-cases-band" id="what" aria-labelledby="use-title"><div class="content-width" data-scroll-scene>
+  <div class="section-heading"><img class="icon " src="assets/icons/layers.svg" width="24" height="24" alt="" aria-hidden="true"><h2 id="use-title">Two ways to use RABBiT</h2></div>
+  <p class="section-intro">Choose the prediction setting based on the participant data available. To our knowledge, RABBiT is the only speech-to-fMRI foundation model that natively supports both zero-shot prediction and parameter-efficient few-shot adaptation.</p>
+  <div class="use-cards">
+    <article class="use-card">
+      <header class="use-card-header"><img class="icon " src="assets/icons/users.svg" width="24" height="24" alt="" aria-hidden="true"><div><h3>Zero-shot</h3><p>No fMRI needed</p></div></header>
+      <ol class="use-flow" aria-label="Prediction workflow"><li><img class="icon " src="assets/icons/headphones.svg" width="24" height="24" alt="" aria-hidden="true"><strong>Audio</strong><span>Any speech</span><img class="icon flow-arrow" src="assets/icons/arrow-right.svg" width="24" height="24" alt="" aria-hidden="true"></li><li><img class="icon " src="assets/icons/layers.svg" width="24" height="24" alt="" aria-hidden="true"><strong>RABBiT</strong><span>No fitting</span><img class="icon flow-arrow" src="assets/icons/arrow-right.svg" width="24" height="24" alt="" aria-hidden="true"></li><li><img class="icon " src="assets/icons/users.svg" width="24" height="24" alt="" aria-hidden="true"><strong>Prediction</strong><span>Population response</span></li></ol>
+      <p class="case-copy">Predict population-level brain responses to any speech, without requiring fMRI.</p>
+      <details class="data-details"><summary>What data is needed?<img class="icon " src="assets/icons/chevron-down.svg" width="24" height="24" alt="" aria-hidden="true"></summary><p>Only the speech audio is needed at prediction time. No participant-specific fitting is performed. The model is already pretrained on paired audio and fMRI.</p></details>
+      <a class="case-link" href="#zeroshot">Explore zero-shot results<img class="icon " src="assets/icons/arrow-right.svg" width="24" height="24" alt="" aria-hidden="true"></a>
+    </article>
+    <article class="use-card">
+      <header class="use-card-header"><img class="icon " src="assets/icons/user.svg" width="24" height="24" alt="" aria-hidden="true"><div><h3>Few-shot</h3><p>A short calibration recording</p></div></header>
+      <ol class="use-flow" aria-label="Prediction workflow"><li><img class="icon " src="assets/icons/database.svg" width="24" height="24" alt="" aria-hidden="true"><strong>Audio + fMRI</strong><span>Short calibration</span><img class="icon flow-arrow" src="assets/icons/arrow-right.svg" width="24" height="24" alt="" aria-hidden="true"></li><li><img class="icon " src="assets/icons/sliders.svg" width="24" height="24" alt="" aria-hidden="true"><strong>Adapt RABBiT</strong><span>Fit to participant</span><img class="icon flow-arrow" src="assets/icons/arrow-right.svg" width="24" height="24" alt="" aria-hidden="true"></li><li><img class="icon " src="assets/icons/user.svg" width="24" height="24" alt="" aria-hidden="true"><strong>Prediction</strong><span>Participant-specific</span></li></ol>
+      <p class="case-copy">Adapt predictions using a small amount of the participant’s fMRI and corresponding audio. Approximately 10 minutes of recordings improves participant-specific prediction in the evaluated setting.</p>
+      <details class="data-details"><summary>What data is needed?<img class="icon " src="assets/icons/chevron-down.svg" width="24" height="24" alt="" aria-hidden="true"></summary><p>Paired audio and fMRI are used for calibration; subsequent predictions use new audio. Ten minutes refers to recording duration, not optimization time. Evaluation uses separate test recordings.</p></details>
+      <a class="case-link" href="#fewshot">Explore few-shot results<img class="icon " src="assets/icons/arrow-right.svg" width="24" height="24" alt="" aria-hidden="true"></a>
+    </article>
+  </div>
+</div></section>
+
+
+<header class="page-intro content-width chapter-intro" id="results" data-scroll-scene><h2>Results</h2><p>Prediction without participant data, adaptation with a short recording, and analyses of learned brain representations.</p>
+  <div class="metric-guide" id="metrics">
+    <h3>How to read the metrics</h3>
+    <div class="metric-items">
+      <details class="data-details"><summary>Group-level alignment<img class="icon" src="assets/icons/chevron-down.svg" width="20" height="20" alt="" aria-hidden="true"></summary><p>Pearson correlation between predicted and group-average fMRI over time, averaged over vertices within each region. This measures shared response structure.</p></details>
+      <details class="data-details"><summary>Individual-level alignment<img class="icon" src="assets/icons/chevron-down.svg" width="20" height="20" alt="" aria-hidden="true"></summary><p>Correlation with a subject’s measured fMRI. Few-shot evaluation uses a separate test recording to assess adaptation to that subject.</p></details>
+      <details class="data-details"><summary>Inter-subject consistency (ISC)<img class="icon" src="assets/icons/chevron-down.svg" width="20" height="20" alt="" aria-hidden="true"></summary><p>Correlation between one subject’s fMRI and the mean of the other subjects. This is a reference for shared responses, not a strict upper bound on group-level alignment.</p></details>
+    </div>
+  </div>
+</header>
+<div class="results-sequence">
+<section class="section" id="zeroshot" data-result-section tabindex="-1">
+<div class="result-intro" data-scroll-scene>
+  <div class="section-heading"><img class="icon " src="assets/icons/bar-chart-2.svg" width="24" height="24" alt="" aria-hidden="true"><h2>Zero-shot results</h2></div>
+  <p class="section-subtitle">Population prediction from speech alone.</p>
+  <p class="lede">
+    Zero-shot evaluation uses held-out speech from <strong>Narratives and Le Petit Prince</strong>, covering 324 participants with no overlap with training. The comparisons below measure brain alignment with <strong>group-average fMRI responses</strong>.
+  </p>
+
+</div>
+<section class="comparison-section" id="comparison" aria-labelledby="comparison-title">
+  <div class="section-heading"><img class="icon " src="assets/icons/bar-chart-2.svg" width="24" height="24" alt="" aria-hidden="true"><h3 id="comparison-title">Comparison with TRIBEv2</h3></div>
+  <div class="comparison-layout" data-scroll-scene>
+    <figure class="figmedia">
+      <a class="figure-link" href="assets/brain_aggregate_delta_tribe_legend.png" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 4 at full size"><img src="assets/brain_aggregate_delta_tribe_legend.png" width="1450" height="1026" loading="lazy" alt="Cortical difference in correlation: RABBiT minus TRIBEv2. Blue favors RABBiT and orange favors TRIBEv2; the legend spans minus 0.2 to plus 0.2."></a>
+      <figcaption class="figcap"><span class="num">Fig 4</span>Mean difference in Pearson correlation: Δ<em>r</em> = RABBiT − TRIBEv2. Blue favors RABBiT; orange favors TRIBEv2. Display range: −0.2 to +0.2.
+      </figcaption>
+    </figure>
+    <div class="comparison-copy">
+      <h3>Largest gains in auditory and temporal cortex</h3>
+      <p>RABBiT shows stronger brain alignment in auditory and temporal language regions. The models perform similarly across several higher-order language regions; TRIBEv2 leads in precuneus/PCC.</p>
+      <p class="comparison-context">This map averages seven Narratives stories and eight Le Petit Prince sections, using group-average fMRI as the target.</p>
+    </div>
+  </div>
+  <details class="comparison-details">
+    <summary>How this comparison is measured<img class="icon" src="assets/icons/chevron-down.svg" width="24" height="24" alt="" aria-hidden="true"></summary>
+    <dl class="comparison-protocol">
+      <div><dt>Prediction target</dt><dd>Pearson correlation over time between each model’s prediction and the mean fMRI response of subjects hearing the same recording, at each cortical vertex.</dd></div>
+      <div><dt>Aggregation</dt><dd>Compute RABBiT − TRIBEv2 for each recording, then take the arithmetic mean across the 15 included recordings. Le Petit Prince section 2 is absent from this figure’s export.</dd></div>
+      <div><dt>Listening inputs and surface</dt><dd>TRIBEv2’s visual input is zeroed. Its correlations on fsaverage5 are mapped to fsaverage6 by nearest-neighbor interpolation for this cortical visualization.</dd></div>
+      <div><dt>Temporal alignment</dt><dd>The exported map uses saved, model-specific timing offsets for each recording before correlation is computed. The offsets need not be identical across models or recordings.</dd></div>
+    </dl>
+    <p>Regional significance and cohort-level summaries follow below. See <a href="#metrics">metric definitions</a> for group-level alignment, individual responses, and inter-subject consistency.</p>
+  </details>
+</section>
+
+  <div class="figrow reverse" data-scroll-scene>
+    <figure class="figmedia bordered">
+      <a class="figure-link" href="assets/vert_story_twosided_bracket_sensorimotorgrouped_with_legend.png?v=1" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 5 at full size"><img loading="lazy" decoding="async" width="2436" height="1507" src="assets/vert_story_twosided_bracket_sensorimotorgrouped_with_legend.png?v=1" alt="Per-region zero-shot brain alignment: RABBiT vs TRIBEv2, with legend for the two models, linear baseline, ISC reference, and significance markers"></a>
+      <figcaption class="figcap"><span class="num">Fig 5</span>Per-region zero-shot brain alignment. RABBiT vs TRIBEv2.</figcaption>
+    </figure>
+    <div class="figbody">
+      <span class="figref">Region by region</span>
+      <h3 class="figtitle">Performance varies by region.</h3>
+      <p>Region by region, RABBiT's largest gains occur in auditory cortex, STG&nbsp;/&nbsp;STS, temporal pole, insula&nbsp;/&nbsp;FOp, and mPFC. The two models perform similarly across much of higher-order language cortex, with precuneus&nbsp;/&nbsp;PCC the one region where TRIBEv2 significantly leads.</p>
+      <p>Visual and motor regions remain near chance for both models in this naturalistic listening evaluation.</p>
     </div>
   </div>
 
-  <!-- Teaser figure — below the numbers band -->
-  <div class="container" style="padding: 0 1.6rem 3.2rem;">
-    <figure class="hero-fig">
-      <img loading="eager" decoding="async" width="1200" height="812" src="assets/teaser.png?v=3" alt="RABBiT teaser: zero-shot and few-shot transfer regimes across 324 participants">
-      <figcaption class="teaser-cap">
-        <strong>No fMRI (zero-shot):</strong> audio in (even speech the model never trained on), predicted group-level fMRI out: the response shared across listeners.
-        &nbsp;·&nbsp;
-        <strong>A few minutes of fMRI (few-shot):</strong> ~10 minutes of the person listening tunes a tiny subject-specific correction, sharpening the prediction where individual brains differ most.
-      </figcaption>
+  <div class="figrow figfull" data-scroll-scene>
+    <figure class="figmedia">
+      <a class="figure-link" href="assets/dots_lang_paper_horiz.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 6 at full size"><img loading="lazy" decoding="async" width="1600" height="554" src="assets/dots_lang_paper_horiz.png?v=2" alt="Group-level language-ROI correlation for RABBiT, TRIBEv2, linear and full-rank baselines, alongside peer and leave-one-out inter-subject consistency estimates"></a>
+      <figcaption class="figcap"><span class="num">Fig 6</span>$r_\text{group}$ across bilateral language ROIs. Narratives &amp; Le&nbsp;Petit&nbsp;Prince.</figcaption>
     </figure>
-  </div>
-</header>
-
-<!-- ─── WHAT IT DOES ───────────────────────────────────────────────── -->
-<section class="section" id="what">
-  <div class="chapter">
-    <span class="folio" aria-hidden="true">01</span>
-    <span class="section-tag">Two ways to use one model</span>
-  </div>
-  <h2>How much fMRI do you have?</h2>
-  <p class="lede">
-    Both regimes below address the same challenge: a new listener hearing speech the model has never encountered. The only difference is how much of that listener's fMRI is available. One model can support both because speech-evoked brain responses contain two kinds of information: reliable structure <em>shared</em> across listeners, and <em>individual</em> differences that become increasingly important in higher-order language regions.
-  </p>
-
-  <div class="pillars">
-    <article class="pillar zero">
-      <span class="tag">Zero-shot &middot; no fMRI</span>
-      <h3 class="title">New speech, no brain data</h3>
-      <p class="claim">
-        No fMRI from this person at all. Audio goes in (even speech the model never trained on), and the response <em>shared</em> across listeners comes out.
-      </p>
-      <div class="claim-bullets">
-        <div class="bullet"><span class="dot zero"></span>Predicts the <strong>shared brain response</strong> to new speech, for entirely new listeners</div>
-        <div class="bullet"><span class="dot zero"></span>Recovers <strong>group-level auditory and language responses</strong> directly from audio</div>
-      </div>
-    </article>
-    <article class="pillar few">
-      <span class="tag">Few-shot &middot; ~10 minutes</span>
-      <h3 class="title">The same, plus a little of their fMRI</h3>
-      <p class="claim">
-        Same new listener, same novel speech, now with <strong>~10 minutes</strong> of their own fMRI. RABBiT learns a compact subject-specific correction that captures what makes their brain <em>unique</em>.
-      </p>
-      <div class="claim-bullets">
-        <div class="bullet"><span class="dot few"></span>No <strong>voxel-wise</strong> model to fit, only a small subject-specific correction</div>
-        <div class="bullet"><span class="dot few"></span>Improves exactly where brains differ most: <strong>higher-order language cortex</strong></div>
-      </div>
-    </article>
+    <div class="figbody">
+      <span class="figref">vs the inter-subject consistency measure (ISC)</span>
+      <h3 class="figtitle">Group-level prediction and inter-subject consistency.</h3>
+      <p>Across the two cohorts, RABBiT has higher language-ROI group-level correlation than TRIBEv2 and the linear baseline, with performance similar to the full-rank readout variant. Here, $r_\text{group}$ correlates the prediction with the cohort-mean fMRI response.</p>
+      <p>Gray dots show peer inter-subject consistency; the black dashed line is the leave-one-out ISC estimate, labeled a ceiling in the source figure. It provides a reference for shared response structure, rather than an absolute upper bound on model accuracy or evidence of complete prediction of an individual's response.</p>
+    </div>
   </div>
 </section>
-
-<!-- ─── RESULT 1 — IT BEHAVES LIKE A BRAIN ────────────────────────── -->
-<section class="section" id="foundation">
-  <div class="chapter">
-    <span class="folio" aria-hidden="true">02</span>
-    <span class="section-tag">Result&nbsp;1 · It behaves like a brain</span>
-  </div>
-  <h2>It organizes like a brain.</h2>
+<section class="section" id="fewshot" data-result-section tabindex="-1">
+<div class="result-intro" data-scroll-scene>
+  <div class="section-heading"><img class="icon " src="assets/icons/sliders.svg" width="24" height="24" alt="" aria-hidden="true"><h2>Few-shot results</h2></div>
+  <p class="section-subtitle">Adaptation from a short calibration recording.</p>
+  <div class="fewshot-intro-layout">
   <p class="lede">
-    Accuracy alone is not enough. If RABBiT is learning meaningful language representations rather than simply fitting data, it should reproduce established properties of the human language network. It does, both from its predictions and from the representations it learns internally.
+    Few-shot adaptation uses a contiguous segment of paired audio and fMRI from the new participant, then evaluates predictions on a separate, fixed test segment. The main benchmark uses <strong>19 participants listening to the 21st Year narrative</strong> and calibration recordings of 5–40 minutes. The ten-minute examples below refer to recording duration, not fitting time.
+  </p>
+    <figure class="fewshot-schematic" id="fewshot-schematic">
+      <a class="figure-link" href="assets/fewshot-adaptation.svg" target="_blank" rel="noopener noreferrer" aria-label="Open the few-shot adaptation schematic at full size">
+        <img src="assets/fewshot-adaptation.svg" width="680" height="224" loading="lazy" decoding="async" alt="Few-shot adaptation: the fixed RABBiT encoder feeds shared and idiosyncratic coefficient heads, each paired with fixed cortical bases. Their responses sum to predicted fMRI. A few minutes of paired audio and fMRI from a new subject tune only the idiosyncratic head: about 115K fitted parameters, roughly 2,000 times fewer than voxel-wise ridge.">
+      </a>
+    </figure>
+  </div>
+</div>
+  <div class="figrow reverse" data-scroll-scene>
+    <figure class="figmedia bordered">
+      <a class="figure-link" href="assets/brain_corr_fewshot_21styear_focus_with_legend_normalized_FULL_YlOrRd_unmasked.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 7 at full size"><img loading="lazy" decoding="async" width="1548" height="1029" src="assets/brain_corr_fewshot_21styear_focus_with_legend_normalized_FULL_YlOrRd_unmasked.png?v=2" alt="Few-shot predicted-vs-actual correlation for a held-out participant listening to the 21st Year narrative, after ~10 minutes of calibration recordings"></a>
+      <figcaption class="figcap"><span class="num">Fig 7</span>Held-out participant (21st Year narrative), using ~10&nbsp;min of calibration recordings. Normalized 0–1 display scale. Fig&nbsp;8 shows the change in correlation directly.</figcaption>
+    </figure>
+    <div class="figbody">
+      <span class="figref">Few-shot accuracy</span>
+      <h3 class="figtitle">Prediction after participant-specific adaptation.</h3>
+      <p>This example shows prediction after fitting the deviation coefficient maps using <strong>~10&nbsp;minutes of paired audio and fMRI</strong>. The backbone, temporal brain transformer, shared pathway, and deviation bases remain fixed.</p>
+    </div>
+  </div>
+
+  <div class="figrow" data-scroll-scene>
+    <figure class="figmedia bordered">
+      <a class="figure-link" href="assets/brain_delta_21styear_C400_fewshot_focus_with_legend.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 8 at full size"><img loading="lazy" decoding="async" width="1447" height="1011" src="assets/brain_delta_21styear_C400_fewshot_focus_with_legend.png?v=2" alt="Cortical map of few-shot minus zero-shot correlation for the same listener: red marks improvement across higher-order language regions, auditory cortex unchanged"></a>
+      <figcaption class="figcap"><span class="num">Fig 8</span>Δ<em>r</em> = few-shot − zero-shot, same listener, −0.1 to +0.1. red ⇒ improved by the 10-min correction, blue ⇒ reduced.</figcaption>
+    </figure>
+    <div class="figbody">
+      <span class="figref">Few-shot minus zero-shot</span>
+      <h3 class="figtitle">Regional changes after adaptation.</h3>
+      <p>For this participant, the larger improvements occur in <strong>higher-order language regions</strong>, including frontal, inferior-parietal, medial frontal, and precuneus&nbsp;/&nbsp;PCC regions. Auditory cortex changes comparatively little.</p>
+    </div>
+  </div>
+
+  <div class="figrow reverse" data-scroll-scene>
+    <figure class="figmedia bordered">
+      <a class="figure-link" href="assets/fewshot_vs_zeroshot_bars.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 9 at full size"><img loading="lazy" decoding="async" width="1680" height="966" src="assets/fewshot_vs_zeroshot_bars.png?v=2" alt="Zero-shot and few-shot correlation in the displayed language regions after ten minutes of calibration recordings, with significance markers"></a>
+      <figcaption class="figcap"><span class="num">Fig 9</span>Per-region accuracy. zero-shot (blue) vs few-shot (red). ∗∗&nbsp;p&lt;0.01, ∗∗∗&nbsp;p&lt;0.001.</figcaption>
+    </figure>
+    <div class="figbody">
+      <span class="figref">Regional comparison</span>
+      <h3 class="figtitle">Zero-shot and adapted predictions.</h3>
+      <p>The displayed higher-order language regions show increased correlation after adaptation using ten minutes of recordings. Both bars use the same pretrained RABBiT model, before and after participant-specific fitting; markers indicate the reported significance levels.</p>
+    </div>
+  </div>
+
+  <div class="figrow" data-scroll-scene>
+    <figure class="figmedia bordered">
+      <a class="figure-link" href="assets/w2v_saturation_paper_4bar.png?v=3" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 10 at full size"><img loading="lazy" decoding="async" width="1497" height="731" src="assets/w2v_saturation_paper_4bar.png?v=3" alt="Few-shot vs ridge regression as a function of calibration recording duration, with a legend for the four series: pretrained ridge, brain-tuned ridge, RABBiT without SID, and RABBiT"></a>
+      <figcaption class="figcap"><span class="num">Fig 10</span>Mean language-ROI correlation vs calibration recording duration. 19 participants, fixed test segment. markers are paired <em>t</em>-tests.</figcaption>
+    </figure>
+    <div class="figbody">
+      <span class="figref">vs per-voxel ridge</span>
+      <h3 class="figtitle">Comparison with voxel-wise ridge regression.</h3>
+      <p>On the main benchmark, RABBiT improves over its zero-shot prediction with <strong>5&nbsp;minutes of calibration recordings</strong> and exceeds both ridge baselines at the tested durations from 5 to 40 minutes. Each method uses the same participant's calibration data.</p>
+      <p>RABBiT updates <strong>~115K parameters per participant</strong>, compared with approximately 222M for the wav2vec2 voxel-wise ridge readout described in the appendix. These are fitted adaptation/readout parameters, not total model sizes.</p>
+    </div>
+  </div>
+
+  <div class="figrow reverse" data-scroll-scene>
+    <figure class="figmedia bordered">
+      <a class="figure-link" href="assets/per_roi_top_C400_with_direct.png?v=3" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 11 at full size"><img loading="lazy" decoding="async" width="1488" height="776" src="assets/per_roi_top_C400_with_direct.png?v=3" alt="Per-region relative change in correlation from zero-shot at ten minutes of calibration recordings, showing pretrained ridge, brain-tuned ridge, RABBiT without SID, and RABBiT"></a>
+      <figcaption class="figcap"><span class="num">Fig 11</span>Improvement over own zero-shot at ~10&nbsp;min. ∗∗&nbsp;/&nbsp;∗∗∗ vs zero-shot.</figcaption>
+    </figure>
+    <div class="figbody">
+      <span class="figref">Ten-minute calibration recordings</span>
+      <h3 class="figtitle">Relative improvement over zero-shot.</h3>
+      <p>At approximately ten minutes of calibration data, the paper reports <strong>30–90% relative increases in correlation</strong> in the displayed higher-order regions. The reference is RABBiT's own zero-shot prediction, not ridge regression; these are relative changes, not percentage-point gains.</p>
+    </div>
+  </div>
+</section>
+<section class="section" id="foundation" data-result-section tabindex="-1">
+<div class="result-intro" data-scroll-scene>
+  <div class="section-heading"><img class="icon " src="assets/icons/activity.svg" width="24" height="24" alt="" aria-hidden="true"><h2>Reproducing neuroscience findings</h2></div>
+  <p class="section-subtitle">Probing auditory and language representations.</p>
+  <p class="lede">
+    In addition to prediction accuracy, we examine the model's responses to a speech-intelligibility contrast and the organization of its learned region representations. These analyses test correspondence with established properties of auditory and language cortex.
   </p>
 
-  <div class="figrow reverse">
+</div>
+  <div class="figrow reverse" data-scroll-scene>
     <figure class="figmedia bordered fig-keepsize">
-      <img loading="lazy" decoding="async" width="3320" height="1208" src="assets/tribe_style_intact_vs_degraded.png?v=3" alt="Predicted intact-minus-degraded speech contrast on the cortical surface: a left-lateralized language network lights up">
+      <a class="figure-link" href="assets/tribe_style_intact_vs_degraded.png?v=3" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 1 at full size"><img loading="lazy" decoding="async" width="3320" height="1208" src="assets/tribe_style_intact_vs_degraded.png?v=3" alt="Predicted intact-minus-degraded speech contrast, with a left-lateralized pattern in language-associated cortex"></a>
       <figcaption class="figcap"><span class="num">Fig 1</span>Predicted intact − degraded speech on the cortical surface.</figcaption>
     </figure>
     <div class="figbody">
-      <span class="figref">A classic localizer</span>
-      <h3 class="figtitle">The language network, reproduced.</h3>
-      <p>Present RABBiT with the standard intelligibility contrast (intact speech versus acoustically matched but unintelligible speech) and subtract the predicted responses. A <strong>left-lateralized fronto-temporo-parietal language network</strong> emerges: frontal, lateral temporal, inferior-parietal and angular regions.</p>
-      <p>Early auditory cortex, which responds similarly to both conditions, largely cancels, exactly as expected. RABBiT was never trained on this contrast or on any controlled localizer.</p>
+      <span class="figref">Fedorenko language localizer</span>
+      <h3 class="figtitle">Intelligible vs unintelligible speech localizer</h3>
+      <p>Subtracting predicted responses to acoustically degraded speech from those to intact speech yields a <strong>left-lateralized pattern</strong> in frontal, lateral temporal, inferior-parietal, and angular regions.</p>
+      <p>The predicted contrast is smaller in early auditory cortex. This analysis probes a model trained on naturalistic stimuli, without fitting it to the localizer contrast.</p>
     </div>
   </div>
 
-  <div class="figrow">
+  <div class="figrow" data-scroll-scene>
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1939" height="1019" src="assets/hierarchy_path_2d_2.png?v=2" alt="A greedy similarity walk through the model's learned per-region representations traces the auditory-to-language processing hierarchy">
+      <a class="figure-link" href="assets/hierarchy_path_2d_2.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 2 at full size"><img loading="lazy" decoding="async" width="1939" height="1019" src="assets/hierarchy_path_2d_2.png?v=2" alt="A greedy similarity walk through the model's learned per-region representations traces the auditory-to-language processing hierarchy"></a>
       <figcaption class="figcap"><span class="num">Fig 2</span>Greedy similarity walk through the model's learned ROI representations.</figcaption>
     </figure>
     <div class="figbody">
       <span class="figref">Emergent hierarchy</span>
-      <h3 class="figtitle">It rebuilds the processing stream.</h3>
-      <p>Each brain region is represented by a learned query inside the model. Starting from primary auditory cortex, repeatedly moving to the most similar not-yet-visited region reconstructs the canonical progression from primary auditory cortex through belt regions, STG&nbsp;/&nbsp;STS, temporal association cortex, and finally <strong>parietal and frontal language regions</strong>.</p>
-      <p>The model is never given this ordering. It emerges purely from the learned representational geometry.</p>
+      <h3 class="figtitle">A coarse auditory-to-language progression.</h3>
+      <p>Starting from primary auditory cortex, a greedy walk to the nearest unvisited ROI query in cosine-similarity space passes through belt regions, STG&nbsp;/&nbsp;STS, temporal association cortex, and <strong>parietal and frontal language regions</strong>.</p>
+      <p>No hierarchy labels supervise these queries. The resulting ordering is consistent with a coarse auditory-to-language progression; it does not establish a causal processing pathway.</p>
     </div>
   </div>
 
   <p class="kicker-note">
-    Together these make RABBiT more than a predictive model. It becomes a <strong>computational model organism</strong> for speech and language, an in-silico brain that can be localized, contrasted, and probed without collecting new fMRI. The next two sections ask how accurately it predicts brain responses: first without any additional fMRI, then with only <strong>~10&nbsp;minutes</strong> of participant-specific data.
+    These analyses characterize the model's predictions and learned representations. The <a href="#zeroshot">zero-shot results</a> evaluate prediction accuracy without participant-specific fitting; the <a href="#fewshot">few-shot results</a> evaluate adaptation using paired audio and fMRI recordings.
   </p>
-</section>
+</section></div>
+<header class="page-intro content-width chapter-intro" id="how" data-scroll-scene><h2>Model architecture</h2><p>How RABBiT maps speech to shared and participant-specific brain responses.</p>
+  <nav class="section-jumps" aria-label="Method sections"><a href="#tbt">Temporal Brain Transformer</a><a href="#sid">Shared–Idiosyncratic Decomposition</a><a href="#ablations">Ablations</a></nav></header>
+<section class="section" id="architecture-details" aria-label="Model architecture">
 
-<!-- ─── RESULT 2 — ZERO-SHOT ──────────────────────────────────────── -->
-<section class="section" id="zeroshot">
-  <div class="chapter">
-    <span class="folio" aria-hidden="true">03</span>
-    <span class="section-tag">Result&nbsp;2 · Zero-shot: no fMRI from the person</span>
-  </div>
-  <h2>The shared response, from speech alone.</h2>
   <p class="lede">
-    The hardest setting: <strong>no fMRI</strong> from this listener, and speech the model has <strong>never encountered</strong>. From audio alone, RABBiT predicts the reliable group-level response <em>shared</em> across listeners. Below, we first show one held-out participant, then summarize performance across all <strong>324</strong> unseen participants.
-  </p>
-
-  <div class="figrow reverse">
-    <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1548" height="1029" src="assets/brain_corr_zeroshot_21styear_focus_with_legend_normalized_FULL_YlGnBu_unmasked.png?v=2" alt="Zero-shot predicted-vs-actual correlation on the cortical surface for a held-out listener — blue, concentrated in auditory and temporal language cortex">
-      <figcaption class="figcap"><span class="num">Fig 3</span>Held-out listener (21st Year narrative) · normalized Pearson&nbsp;<em>r</em>, 0–1 scale.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">Zero-shot accuracy</span>
-      <h3 class="figtitle">Validated across multiple novel studies and stimuli.</h3>
-      <p>Without any retraining, RABBiT already predicts speech-evoked activity across <strong>auditory cortex and the temporal language network</strong>, the parts of the response that are reliably shared across people.</p>
-    </div>
-  </div>
-
-  <div class="figrow">
-    <figure class="figmedia">
-      <img loading="lazy" decoding="async" width="1450" height="1026" src="assets/brain_aggregate_delta_tribe_legend.png?v=2" alt="Cortical map of the RABBiT-minus-TRIBEv2 advantage: blue marks where RABBiT predicts better, concentrated in auditory and temporal cortex; orange marks where TRIBEv2 is better">
-      <figcaption class="figcap"><span class="num">Fig 4</span>Δ<em>r</em> = RABBiT − TRIBEv2, −0.2 to +0.2 · blue ⇒ RABBiT better, orange ⇒ TRIBEv2 better.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">vs a billion-parameter model</span>
-      <h3 class="figtitle">Ahead of a far larger model.</h3>
-      <p>Compared with <strong>TRIBEv2</strong>, a billion-parameter multimodal brain foundation model, RABBiT's largest gains concentrate in <strong>auditory and temporal language cortex</strong>, despite being trained on only <strong>six participants</strong> and predicting at <strong>four times the cortical resolution</strong>.</p>
-    </div>
-  </div>
-
-  <div class="figrow reverse">
-    <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="2436" height="1507" src="assets/vert_story_twosided_bracket_sensorimotorgrouped_with_legend.png?v=1" alt="Per-region zero-shot accuracy: RABBiT vs TRIBEv2, with legend for the two models, linear baseline, ISC ceiling, and significance markers">
-      <figcaption class="figcap"><span class="num">Fig 5</span>Per-region zero-shot accuracy · RABBiT vs TRIBEv2.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">Region by region</span>
-      <h3 class="figtitle">The advantage, quantified.</h3>
-      <p>Region by region, RABBiT's largest gains occur in auditory cortex, STG&nbsp;/&nbsp;STS, temporal pole, insula&nbsp;/&nbsp;FOp, and mPFC. The two models perform similarly across much of higher-order language cortex, with precuneus&nbsp;/&nbsp;PCC the one region where TRIBEv2 significantly leads.</p>
-      <p>Visual and motor regions remain near chance for both, as expected for an audio-only model.</p>
-    </div>
-  </div>
-
-  <div class="figrow figfull">
-    <figure class="figmedia">
-      <img loading="lazy" decoding="async" width="1600" height="554" src="assets/dots_lang_paper_horiz.png?v=2" alt="Group-level prediction across language ROIs vs the inter-subject-consistency ceiling: RABBiT reaches the ceiling on Narratives and surpasses it on Le Petit Prince, above TRIBEv2 and a linear baseline">
-      <figcaption class="figcap"><span class="num">Fig 6</span>$r_\text{group}$ across bilateral language ROIs · Narratives &amp; Le&nbsp;Petit&nbsp;Prince.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">vs the inter-subject consistency measure (ISC)</span>
-      <h3 class="figtitle">It reliably reaches or exceeds the ISC.</h3>
-      <p>Across <strong>324</strong> unseen participants, RABBiT reaches, and on one cohort slightly exceeds, the <strong>leave-one-out inter-subject consistency</strong> estimate, indicating that its remaining error is approaching the reliability of the target itself. It matches a much larger per-subject readout while remaining substantially smaller, and both the billion-parameter TRIBEv2 and the linear baseline remain below this reference.</p>
-      <p>Gray dots show peer inter-subject consistency; the dashed line is the leave-one-out consistency estimate.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ─── RESULT 3 — FEW-SHOT ───────────────────────────────────────── -->
-<section class="section" id="fewshot">
-  <div class="chapter">
-    <span class="folio" aria-hidden="true">04</span>
-    <span class="section-tag">Result&nbsp;3 · Few-shot: a few minutes of fMRI data</span>
-  </div>
-  <h2>Ten minutes completes the picture.</h2>
-  <p class="lede">
-    Zero-shot predicts what listeners <em>share</em>. The parts that make a brain <em>individual</em>, primarily higher-order language regions, require only a small amount of participant-specific data. About <strong>10 minutes</strong> is enough for RABBiT to learn that remaining structure.
-  </p>
-
-  <div class="figrow reverse">
-    <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1548" height="1029" src="assets/brain_corr_fewshot_21styear_focus_with_legend_normalized_FULL_YlOrRd_unmasked.png?v=2" alt="Few-shot predicted-vs-actual correlation for the same listener after ~10 minutes of their data — warmer and more widespread across the language network">
-      <figcaption class="figcap"><span class="num">Fig 7</span>Same listener, after ~10&nbsp;min · normalized Pearson&nbsp;<em>r</em>, 0–1 (same scale as Fig&nbsp;3).</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">Few-shot accuracy</span>
-      <h3 class="figtitle">Sharper across the language network.</h3>
-      <p>A compact subject-specific correction, learned from <strong>~10&nbsp;minutes</strong> of listening, substantially improves prediction across the language network. The model itself does not change; only the small personalization pathway is updated.</p>
-    </div>
-  </div>
-
-  <div class="figrow">
-    <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1447" height="1011" src="assets/brain_delta_21styear_C400_fewshot_focus_with_legend.png?v=2" alt="Cortical map of few-shot minus zero-shot correlation for the same listener: red marks improvement across higher-order language regions, auditory cortex unchanged">
-      <figcaption class="figcap"><span class="num">Fig 8</span>Δ<em>r</em> = few-shot − zero-shot, same listener, −0.1 to +0.1 · red ⇒ improved by the 10-min correction, blue ⇒ reduced.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">Where ten minutes lands</span>
-      <h3 class="figtitle">The gain lands on the language network.</h3>
-      <p>Comparing few-shot to zero-shot directly shows that almost all of the improvement occurs in <strong>higher-order language cortex</strong> (frontal, inferior-parietal, medial frontal, and precuneus&nbsp;/&nbsp;PCC regions), while auditory cortex, already well captured zero-shot, changes very little.</p>
-    </div>
-  </div>
-
-  <div class="figrow reverse">
-    <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1680" height="966" src="assets/fewshot_vs_zeroshot_bars.png?v=2" alt="Per-region accuracy, zero-shot versus after ten minutes, across higher-order language regions — every region improves significantly">
-      <figcaption class="figcap"><span class="num">Fig 9</span>Per-region accuracy · zero-shot (blue) vs few-shot (red) · ∗∗&nbsp;p&lt;0.01, ∗∗∗&nbsp;p&lt;0.001.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">Every region improves</span>
-      <h3 class="figtitle">The gains are exactly where brains differ.</h3>
-      <p>Across the regions that vary most across individuals, the 10-minute correction <strong>significantly improves prediction</strong> throughout the language network. Both bars correspond to the same RABBiT model: before and after personalization.</p>
-    </div>
-  </div>
-
-  <div class="figrow">
-    <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1497" height="731" src="assets/w2v_saturation_paper_4bar.png?v=3" alt="Few-shot vs ridge regression as a function of calibration time, with a legend for the four series: pretrained ridge, brain-tuned ridge, RABBiT without SID, and RABBiT">
-      <figcaption class="figcap"><span class="num">Fig 10</span>Mean language-ROI accuracy vs calibration time · markers are paired <em>t</em>-tests.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">vs per-voxel ridge</span>
-      <h3 class="figtitle">Beats ridge with a far lower budget.</h3>
-      <p>RABBiT improves over its own zero-shot prediction after only <strong>5&nbsp;minutes</strong> of calibration and consistently outperforms both voxel-wise ridge baselines through 40&nbsp;minutes. It achieves this while updating only <strong>~115K parameters per participant</strong>, roughly 1000&times; fewer than voxel-wise ridge.</p>
-    </div>
-  </div>
-
-  <div class="figrow reverse">
-    <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1488" height="776" src="assets/per_roi_top_C400_with_direct.png?v=3" alt="Per-region percent change at 10 minutes, RABBiT few-shot vs ridge, with a legend for the four series: pretrained ridge, brain-tuned ridge, RABBiT without SID, and RABBiT">
-      <figcaption class="figcap"><span class="num">Fig 11</span>Improvement over own zero-shot at ~10&nbsp;min · ∗∗&nbsp;/&nbsp;∗∗∗ vs zero-shot.</figcaption>
-    </figure>
-    <div class="figbody">
-      <span class="figref">At ten minutes</span>
-      <h3 class="figtitle">Up to ~90% better, region by region.</h3>
-      <p>Relative to its <em>own</em> zero-shot prediction, ~10&nbsp;minutes increases performance by <strong>roughly 30 to 90%</strong> in IFG, supramarginal gyrus, angular gyrus, MFG&nbsp;/&nbsp;DLPFC, mPFC, and precuneus&nbsp;/&nbsp;PCC, the very regions identified by the model as most individual across listeners.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ─── HOW IT WORKS ───────────────────────────────────────────────── -->
-<section class="section" id="how">
-  <div class="chapter">
-    <span class="folio" aria-hidden="true">05</span>
-    <span class="section-tag">How it works</span>
-  </div>
-  <h2>Inside the model.</h2>
-  <p class="lede">
-    Two ideas make both transfer regimes possible. One learns how different brain regions selectively integrate information from speech. The other separates what listeners <em>share</em> from what makes each brain <em>unique</em>, allowing the same model to support both zero-shot and few-shot prediction. Then two checks show which components are load-bearing, and why a few minutes of data help exactly where they do.
+    The Temporal Brain Transformer constructs region-level representations from speech. Shared–Idiosyncratic Decomposition maps these representations to a shared response component and a participant-specific deviation. Together they support population prediction and adaptation of the deviation pathway.
   </p>
 
   <!-- ─── TBT ─────────────────────────────────────────────────────── -->
-  <h3 class="component-h tbt">
+  <h2 class="component-h tbt" id="tbt">
     <span class="badge tbt">TBT</span>
     Temporal Brain Transformer
-  </h3>
+  </h2>
   <p class="component-tagline">Region-specific attention over the speech stream.</p>
   <p>
-    Rather than fitting an independent readout for every voxel, RABBiT learns <strong>one query per cortical region</strong>. Each query attends across the speech sequence and decides which moments of audio matter for that region, producing a compact per-region representation $z_i$. <strong>30 regions</strong> (15 bilateral HCP-MMP1 groupings on fsaverage6) replace millions of independent per-voxel weights.
+    RABBiT learns <strong>one query per cortical region</strong>. Each query attends across the speech sequence to produce a region-level representation $z_i$. The model uses <strong>30 regions</strong> (15 bilateral HCP-MMP1 groupings on fsaverage6); the SID readout then maps these representations to vertex-level predictions. The expression below summarizes a single attention head; the full model uses stacked multi-head blocks.
   </p>
-  <div class="formula math">
+  <details class="equation-details" open><summary>Attention equation<img class="icon " src="assets/icons/chevron-down.svg" width="24" height="24" alt="" aria-hidden="true"></summary><div class="formula math">
     $$\alpha_{i,t} = \operatorname{softmax}_t \! \left( \langle W_Q\, q_i, \; W_K\, x_t \rangle \right), \qquad z_i = \sum_t \alpha_{i,t} \cdot W_V\, x_t \;\in\; \mathbb{R}^{d_o}$$
-  </div>
+  </div></details>
 
-  <div class="figrow reverse">
+  <div class="figrow reverse" data-scroll-scene>
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="2224" height="1123" src="assets/transformer.png?v=2" alt="RABBiT cross-attention readout: ROI query tokens attend to the speech-token sequence">
+      <a class="figure-link" href="assets/transformer.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 12 at full size"><img loading="lazy" decoding="async" width="2224" height="1123" src="assets/transformer.png?v=2" alt="RABBiT cross-attention readout: ROI query tokens attend to the speech-token sequence"></a>
       <figcaption class="figcap"><span class="num">Fig 12</span>ROI query tokens attend to the speech-token sequence.</figcaption>
     </figure>
     <div class="figbody">
-      <span class="figref">TBT · the readout</span>
+      <span class="figref">TBT readout</span>
       <h3 class="figtitle">One query per region.</h3>
       <p>Each brain region learns its own query over the speech stream. Rather than pooling speech uniformly, every region selectively gathers the moments most relevant to it, producing a compact region-level representation <strong>z<sub>i</sub></strong>.</p>
     </div>
   </div>
 
   <!-- ─── SID ─────────────────────────────────────────────────────── -->
-  <h3 class="component-h sid">
+  <h2 class="component-h sid" id="sid">
     <span class="badge sid">SID</span>
     Shared–Idiosyncratic Decomposition
-  </h3>
-  <p class="component-tagline">What everyone shares + what makes a brain individual.</p>
+  </h2>
+  <p class="component-tagline">Shared population structure and participant-specific deviations.</p>
   <p>
-    Each region's response is written as a <strong>shared population subspace</strong> ($\Phi_i$) plus a small <strong>per-person deviation</strong> ($\Delta_{i,s}$). The shared part is what drives the <em>zero-shot</em> prediction for anyone; the deviation is the small, structured difference that the <em>few-shot</em> step tunes for an individual. This split is exactly why one model covers both regimes, and why ~10 minutes of data is enough to adapt.
+    Each region's predicted response combines a <strong>shared basis</strong> ($\Phi_i$) and a <strong>participant-specific deviation basis</strong> ($\Delta_{i,s}$), with stimulus-dependent coefficients. For a new participant, zero-shot prediction uses the shared basis together with the average deviation basis learned from the training cohort. Few-shot adaptation retains those bases and fits the deviation coefficient maps to the new participant's calibration recordings.
   </p>
-  <div class="formula math">
+  <details class="equation-details" open><summary>Prediction equation<img class="icon " src="assets/icons/chevron-down.svg" width="24" height="24" alt="" aria-hidden="true"></summary><div class="formula math">
     $$\hat{y}^{(s)}_i = \pi_i(z_i) \, \Phi_i \;+\; \rho_i(z_i) \, \Delta_{i,s}$$
-  </div>
+  </div></details>
   <p class="formula-legend">
-    $\Phi_i$ is the shared basis (the population response subspace for region $i$); $\Delta_{i,s}$ is the per-person deviation basis; $\pi_i, \rho_i$ are small heads that read out from the region representation $z_i$. Few-shot updates only $\rho_i$ (the deviation coefficients), and freezes everything else.
+    $\pi_i$ and $\rho_i$ map the region representation $z_i$ to shared and deviation coefficients. For a new participant, $\Delta_{i,s}$ is initialized to the training-cohort average and held fixed. Few-shot updates only the parameters of $\rho_i$; the backbone, transformer, shared maps, and all bases remain frozen.
   </p>
 
-  <div class="figrow figfull">
+  <div class="figrow figfull" data-scroll-scene>
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="2700" height="833" src="assets/training-process.png?v=2" alt="RABBiT pipeline: audio → speech backbone → TBT → SID → predicted fMRI">
+      <a class="figure-link" href="assets/training-process.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 13 at full size"><img loading="lazy" decoding="async" width="2700" height="833" src="assets/training-process.png?v=2" alt="RABBiT pipeline: audio → speech backbone → TBT → SID → predicted fMRI"></a>
       <figcaption class="figcap"><span class="num">Fig 13</span>audio → speech backbone → TBT → SID → predicted fMRI.</figcaption>
     </figure>
     <div class="figbody">
       <span class="figref">End to end</span>
       <h3 class="figtitle">From speech to brain.</h3>
       <p>A brain-tuned speech model converts audio into speech representations. The <strong>Temporal Brain Transformer</strong> routes them into region-level representations. <strong>SID</strong> then separates every prediction into a shared population response and a compact participant-specific deviation before producing high-resolution fMRI predictions.</p>
-      <p>The entire model is trained end-to-end on six participants from CNeuroMod Friends.</p>
+      <p>Training uses paired audio and fMRI from CNeuroMod Friends, with LoRA adaptation of the speech backbone. Cohort size, recording conditions, and data splits are documented in the <a href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer">paper's Methods and appendix</a>.</p>
     </div>
   </div>
 
   <!-- ─── WHY IT WORKS — ablations + diagnostic, folded into How it works ── -->
-  <h3 class="component-h">Why it works: what each piece buys you</h3>
-  <p class="component-tagline">Ablate a component, or leave a person out, and watch zero-shot accuracy move.</p>
+  <h2 class="component-h" id="ablations">Component analyses and ablations</h2>
+  <p class="component-tagline">Evaluating model components and shared response structure.</p>
 
-  <div class="figrow reverse">
+  <div class="figrow reverse" data-scroll-scene>
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1548" height="1084" src="assets/appendix_variants_lang_sig.png?v=2" alt="Component ablations: removing brain-tuning or the temporal brain transformer hurts; the decomposition matches a far larger per-subject readout">
+      <a class="figure-link" href="assets/appendix_variants_lang_sig.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 14 at full size"><img loading="lazy" decoding="async" width="1548" height="1084" src="assets/appendix_variants_lang_sig.png?v=2" alt="Component ablations: removing brain-tuning or the temporal brain transformer hurts; the decomposition matches a far larger per-subject readout"></a>
       <figcaption class="figcap"><span class="num">Fig 14</span>Zero-shot accuracy as components are removed or swapped.</figcaption>
     </figure>
     <div class="figbody">
       <span class="figref">Ablations</span>
-      <h3 class="figtitle">Which pieces matter.</h3>
-      <p><strong>Brain-tuning</strong> contributes the largest improvement in zero-shot prediction, while removing the <em>Temporal Brain Transformer</em> also significantly reduces performance. SID matches a full participant-specific readout using roughly <strong>five times fewer parameters</strong>, and replacing wav2vec2 with a much larger speech model provides little additional benefit.</p>
+      <h3 class="figtitle">Contributions to zero-shot prediction.</h3>
+      <p>Removing <strong>brain-tuning</strong> produces the largest reduction in zero-shot correlation; removing the Temporal Brain Transformer also reduces performance. Replacing SID with full participant-specific readouts gives no significant improvement in the reported comparison, despite roughly five times as many trainable model parameters. Replacing wav2vec2-base with WavLM-large provides little additional benefit in this evaluation.</p>
     </div>
   </div>
 
-  <div class="figrow">
+  <div class="figrow" data-scroll-scene>
     <figure class="figmedia bordered">
-      <img loading="lazy" decoding="async" width="1500" height="511" src="assets/sid_diagnostic.png?v=2" alt="Leave-one-subject-out diagnostic: auditory regions are shared across people; higher-order language regions are individual">
+      <a class="figure-link" href="assets/sid_diagnostic.png?v=2" target="_blank" rel="noopener noreferrer" aria-label="Open Figure 15 at full size"><img loading="lazy" decoding="async" width="1500" height="511" src="assets/sid_diagnostic.png?v=2" alt="Correlation with a group average including or excluding the participant, compared across auditory and language regions"></a>
       <figcaption class="figcap"><span class="num">Fig 15</span>Group average <em>including</em> (blue) vs <em>excluding</em> (orange) the listener.</figcaption>
     </figure>
     <div class="figbody">
       <span class="figref">The diagnostic</span>
-      <h3 class="figtitle">Why minutes help where they do.</h3>
-      <p>Leaving one listener out of the population average barely changes early auditory cortex: the response there is largely <strong>shared</strong>, so zero-shot already predicts it well. Higher-order language regions change dramatically, indicating that they contain the strongest participant-specific structure.</p>
-      <p>Those are precisely the regions where <em>few-shot</em> adaptation produces its largest gains.</p>
+      <h3 class="figtitle">Shared and participant-specific response structure.</h3>
+      <p>Correlations with the group average decrease more in higher-order language regions when the participant is excluded from that average. This pattern motivates the distinction between shared and participant-specific response components.</p>
+      <p>The same regions tend to show larger few-shot gains. The averaging diagnostic describes this association; it does not by itself establish the cause of the gains.</p>
     </div>
   </div>
+  <p class="kicker-note">
+    <strong>Evaluation scope.</strong> The reported transfer results primarily concern English naturalistic listening and auditory/language regions. Generalization to other languages, reading, conversation, and multimodal tasks requires further evaluation. Few-shot results concern adaptation to individual participants, rather than a single calibration for an entire new dataset. Training and evaluation details are provided in the paper's Methods and limitations.
+  </p>
 </section>
-
-<!-- ─── RESOURCES ──────────────────────────────────────────────────── -->
 <section class="section util" id="resources">
-  <div class="chapter">
-    <span class="section-tag">Resources</span>
-  </div>
-  <h2>Code, weights, demos.</h2>
+  <div class="section-heading"><img class="icon " src="assets/icons/download.svg" width="24" height="24" alt="" aria-hidden="true"><h2>Resources</h2></div>
+  <p class="section-subtitle">Code, weights, demos.</p>
   <p class="lede">
-    Everything that goes with the paper. The code repo and demo notebook are
-    enough to reproduce inference on any released checkpoint; training scripts
-    and configs live alongside.
+    Paper, implementation, prediction examples, and source datasets.
   </p>
 
-  <div class="resources">
+  <div class="resources" data-scroll-scene>
     <a class="res res-demo" href="demo/">
-      <span class="res-ico" aria-hidden="true">🧠</span>
-      <span class="res-name">Live demo</span>
-      <span class="res-desc">Play a clip or speak into your mic, and RABBiT predicts a held-out listener's language-network BOLD live in your browser. No server, no install.</span>
+      <img class="icon" src="assets/icons/play-circle.svg" width="20" height="20" alt="" aria-hidden="true">
+      <span class="res-name">Browser demo</span>
+      <span class="res-desc">Replay precomputed audio-to-fMRI examples, or use experimental microphone inference on a supported desktop. Predictions estimate a population response, without fitting to the visitor.</span>
       <span class="res-tag">interactive</span>
     </a>
     <a class="res" href="https://arxiv.org/pdf/2607.05171" target="_blank" rel="noopener noreferrer">
-      <span class="res-ico" aria-hidden="true">📄</span>
+      <img class="icon" src="assets/icons/file-text.svg" width="20" height="20" alt="" aria-hidden="true">
       <span class="res-name">Paper (PDF)</span>
       <span class="res-desc">The full paper, including methods, results, and appendix.</span>
       <span class="res-tag">arXiv</span>
     </a>
     <a class="res" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">
-      <span class="res-ico" aria-hidden="true">⌗</span>
+      <img class="icon" src="assets/icons/code.svg" width="20" height="20" alt="" aria-hidden="true">
       <span class="res-name">Code</span>
-      <span class="res-desc">PyTorch implementation. Inference + training. Apache-2.0.</span>
+      <span class="res-desc">PyTorch implementation and inference examples. Apache-2.0.</span>
       <span class="res-tag">GitHub</span>
     </a>
     <a class="res" href="https://github.com/bridge-ai-neuro/rabbit/blob/main/notebooks/demo.ipynb" target="_blank" rel="noopener noreferrer">
-      <span class="res-ico" aria-hidden="true">📓</span>
+      <img class="icon" src="assets/icons/book-open.svg" width="20" height="20" alt="" aria-hidden="true">
       <span class="res-name">Demo notebook</span>
-      <span class="res-desc">Loads a checkpoint, predicts on one Friends clip, plots audio + predictions side-by-side.</span>
+      <span class="res-desc">A worked example of loading RABBiT and predicting fMRI from audio.</span>
       <span class="res-tag">GitHub</span>
     </a>
     <a class="res" href="#release-status">
-      <span class="res-ico" aria-hidden="true">⬇</span>
-      <span class="res-name">Checkpoints</span>
-      <span class="res-desc">Friends shared-dev (wav2vec2-base + WavLM-large), and the moth+friends combined model.</span>
-      <span class="res-tag">release: pending</span>
+      <img class="icon" src="assets/icons/download.svg" width="20" height="20" alt="" aria-hidden="true">
+      <span class="res-name">Browser model</span>
+      <span class="res-desc">The ONNX weights used for experimental microphone inference.</span>
+      <span class="res-tag">ONNX export</span>
     </a>
-    <a class="res" href="https://www.cneuromod.ca/">
-      <span class="res-ico" aria-hidden="true">🧠</span>
+    <a class="res" href="#datasets">
+      <img class="icon" src="assets/icons/database.svg" width="20" height="20" alt="" aria-hidden="true">
       <span class="res-name">Data</span>
-      <span class="res-desc">CNeuroMod Friends, Narratives, Le Petit Prince. Links + preprocessing instructions.</span>
+      <span class="res-desc">CNeuroMod Friends, Narratives, and Le Petit Prince. Source repositories and access information.</span>
       <span class="res-tag">external</span>
     </a>
   </div>
 
-  <div id="release-status" style="margin-top: 1.6rem; padding: 1rem 1.2rem; background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: var(--radius); font-size: 0.92rem; color: var(--ink-soft); max-width: 78ch;">
-    <strong>Release status.</strong> The
-    <a href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">arXiv preprint</a>
-    and <a href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">code repository</a>
-    are now public, including the
-    <a href="https://github.com/bridge-ai-neuro/rabbit/blob/main/notebooks/demo.ipynb" target="_blank" rel="noopener noreferrer">demo notebook</a>.
-    Hugging Face model cards and pretrained checkpoint downloads will follow shortly.
-    Meanwhile, this page and the <a href="demo/">live in-browser demo</a> are the
-    best way to explore RABBiT.
+  <div class="resource-details" id="release-status">
+    <h3>Model availability</h3>
+    <p>The <a href="https://huggingface.co/omermosa/rabbit" target="_blank" rel="noopener noreferrer">RABBiT model repository</a> currently provides the <code>rabbit_fp32.onnx</code> browser export. Its approximately 422 MB download starts only when you choose to load the microphone model. Recorded examples work without these weights.</p>
   </div>
-</section>
-
-<!-- ─── CITE ───────────────────────────────────────────────────────── -->
-<section class="section util" id="cite">
-  <div class="chapter">
-    <span class="section-tag">Cite this paper</span>
+  <div class="resource-details" id="datasets">
+    <h3>Source datasets</h3>
+    <ul class="dataset-links">
+      <li><a href="https://www.cneuromod.ca/">CNeuroMod Friends</a><span>Project and data access</span></li>
+      <li><a href="https://openneuro.org/datasets/ds002345">Narratives</a><span>Dataset on OpenNeuro</span></li>
+      <li><a href="https://openneuro.org/datasets/ds003643">Le Petit Prince</a><span>Dataset on OpenNeuro</span></li>
+    </ul>
   </div>
-  <h2>BibTeX</h2>
+</section><section class="section util" id="cite">
+  <div class="section-heading"><img class="icon " src="assets/icons/file-text.svg" width="24" height="24" alt="" aria-hidden="true"><h2>Citation</h2></div>
+  <p class="section-subtitle">BibTeX</p>
   <p class="lede">If RABBiT is useful for your work, please cite it.</p>
-  <pre class="bib">@article{moussa2026rabbit,
+  <div class="citation-actions"><button type="button" id="copy-citation" hidden>Copy BibTeX</button><a href="assets/rabbit.bib" download="rabbit.bib">Download .bib</a><span id="citation-status" role="status"></span></div>
+  <pre class="bib" id="citation-text" tabindex="0" aria-label="BibTeX citation">@article{moussa2026rabbit,
   title     = {RABBiT: Rapidly Adaptive {BOLD} Foundation Model via Brain-Tuning
                for Accurate Zero-Shot and Few-Shot Prediction of
                Speech-Elicited Responses in the Brain},
-  author    = {Moussa, Omer and others},
+  author    = {Moussa, Omer and Toneva, Mariya},
   journal   = {arXiv preprint arXiv:2607.05171},
-  year      = {2026}
+  year      = {2026},
+  doi       = {10.48550/arXiv.2607.05171},
+  url       = {https://arxiv.org/abs/2607.05171}
 }</pre>
-</section>
-
-
-<script>
-  // Top-bar navigation behaviour, in one passive rAF-throttled scroll handler:
-  //  (1) highlight the link of the section you're reading — the lowest linked
-  //      section whose top has passed a reference line ~30% down the viewport
-  //      (robust at the page bottom, where the last section can't reach a band);
-  //  (2) tint the active highlight with that section's accent;
-  //  (3) fill the bottom-edge progress line; (4) condense the bar once scrolled.
-  (function () {
-    const nav   = document.querySelector('nav.top');
-    const prog  = nav && nav.querySelector('.nav-progress');
-    const doc   = document.documentElement;
-    // both navs share one spy: top-bar links (subset) + the side nav (all sections)
-    const allLinks = Array.from(document.querySelectorAll('nav.top a.section-link, .page-nav a'));
-    const spy = ['top', 'what', 'foundation', 'zeroshot', 'fewshot', 'how', 'resources', 'cite'];
-    const secs = spy.map(id => document.getElementById(id)).filter(Boolean);
-    let ticking = false, curId = null;
-    function update() {
-      ticking = false;
-      const max = doc.scrollHeight - doc.clientHeight;
-      if (prog) prog.style.setProperty('--p', (max > 0 ? doc.scrollTop / max : 0).toFixed(4));
-      if (nav) nav.classList.toggle('scrolled', doc.scrollTop > 40);
-      const line = window.scrollY + window.innerHeight * 0.3;
-      let activeId = '';
-      for (const s of secs) if (s.offsetTop <= line) activeId = s.id;
-      if (activeId !== curId) {
-        curId = activeId;
-        const sel = '#' + activeId;
-        allLinks.forEach(a => {
-          const on = !!activeId && a.getAttribute('href') === sel;
-          a.classList.toggle('active', on);
-          if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
-        });
-        if (nav && activeId) {
-          const el = document.getElementById(activeId);
-          const accent = el ? getComputedStyle(el).getPropertyValue('--sec').trim() : '';
-          if (accent) nav.style.setProperty('--active-sec', accent);
-        }
-      }
-    }
-    function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
-    addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('resize', onScroll, { passive: true });
-    update();
-  })();
-
-  // Pause the hero video + show its poster when the user prefers reduced motion
-  // OR has Data-Saver on (don't pull the 6 MB mp4 on a metered connection).
-  (function () {
-    const v = document.querySelector('.hero-video');
-    if (!v) return;
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const saveData = navigator.connection && navigator.connection.saveData;
-    const hold = () => { v.removeAttribute('autoplay'); v.pause(); v.currentTime = 0; };
-    const apply = () => { if (mq.matches || saveData) hold(); };
-    apply();
-    mq.addEventListener && mq.addEventListener('change', apply);
-  })();
-
-  // Mobile section nav: the hamburger toggles the collapsed link menu.
-  // Closes on link tap, outside click, or Escape.
-  (function () {
-    const btn = document.getElementById('navToggle');
-    const menu = document.getElementById('nav-sections');
-    if (!btn || !menu) return;
-    const close = () => { menu.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); };
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = menu.classList.toggle('open');
-      btn.setAttribute('aria-expanded', String(isOpen));
-    });
-    menu.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
-    document.addEventListener('click', (e) => {
-      if (menu.classList.contains('open') && !menu.contains(e.target) && e.target !== btn) close();
-    });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
-  })();
-
-  // Theme toggle: cycle light → moderate → dark, persist, keep icon/label + the
-  // browser theme-colour in sync. (Removable theme system — see assets/themes.css.)
-  (function () {
-    const root = document.documentElement;
-    const order = ['light', 'moderate', 'dark'];
-    const names = { light: 'Light', moderate: 'Moderate', dark: 'Dark' };
-    const colors = { light: '#fcfcf9', moderate: '#f2e9d8', dark: '#191816' };
-    const meta = document.querySelector('meta[name="theme-color"]');
-    const btn = document.getElementById('theme-toggle');
-    function sync(t) {
-      if (meta) meta.setAttribute('content', colors[t] || colors.light);
-      if (btn) {
-        const next = order[(order.indexOf(t) + 1) % order.length];
-        btn.setAttribute('title', 'Theme: ' + names[t] + ' (switch to ' + names[next] + ')');
-        btn.setAttribute('aria-label', 'Theme: ' + names[t] + '. Switch to ' + names[next] + '.');
-      }
-    }
-    sync(root.getAttribute('data-theme') || 'light');
-    if (btn) btn.addEventListener('click', function () {
-      const cur = root.getAttribute('data-theme') || 'light';
-      const next = order[(order.indexOf(cur) + 1) % order.length];
-      root.setAttribute('data-theme', next);
-      try { localStorage.setItem('rabbit-theme', next); } catch (e) {}
-      sync(next);
-    });
-  })();
-</script>
-
-<!-- ─── Footer ─────────────────────────────────────────────────────── -->
-<footer>
-  <div class="inner">
-    <div class="left">
+</section><section class="section" id="acknowledgements"><div class="section-heading"><h2>Acknowledgements</h2></div><p>
       <strong>Acknowledgements.</strong> RABBiT builds on data from the
       <a href="https://www.cneuromod.ca/">CNeuroMod project</a>,
-      <a href="https://snastase.github.io/datasets/ds002345.html">the Narratives dataset</a>, and
+      <a href="https://openneuro.org/datasets/ds002345">the Narratives dataset</a>, and
       <a href="https://openneuro.org/datasets/ds003643">Le Petit Prince (Bhattasali et al.)</a>.
       We thank the CNeuroMod team for the Friends fMRI release and the
       <a href="https://github.com/facebookresearch/tribev2">TRIBEv2 authors</a> for code + checkpoints.
-    </div>
-    <div class="right">
-      Apache-2.0 · v0.1<br>
-      <a href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">arXiv preprint</a> · 2026<br>
-      <a href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">code repository</a>
-    </div>
-  </div>
-</footer>
-
-<!-- Warm the live-demo model into Cache Storage in the background, so the mic is
-     ready by the time a visitor reaches the demo. Same cache + URL as demo/app.js
-     (keep in sync). Desktop + good-network only, low priority, after the page settles. -->
-<script>
-(function () {
-  if (!window.isSecureContext || !("caches" in window)) return;
-  var conn = navigator.connection || {};
-  var coarse = window.matchMedia && matchMedia("(pointer: coarse)").matches;
-  var mobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
-  if (coarse || mobile || conn.saveData) return;                  // skip phones / Data-Saver
-  if (typeof navigator.deviceMemory === "number" && navigator.deviceMemory > 0 && navigator.deviceMemory < 8) return;
-  // Keep in sync with demo/app.js — empty until the model is published to a HF repo.
-  var MODEL_HF_REPO = "";
-  var onLocalhost = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-  var url = onLocalhost
-    ? "demo/assets/rabbit_fp32.onnx"
-    : (MODEL_HF_REPO ? "https://huggingface.co/" + MODEL_HF_REPO + "/resolve/main/rabbit_fp32.onnx" : "");
-  if (!url) return;                                               // nothing published yet → nothing to warm
-  var warm = function () {
-    caches.open("rabbit-model-v1").then(function (cache) {
-      cache.match(url).then(function (hit) {
-        if (hit) return;                                          // already cached
-        fetch(url, { mode: "cors", priority: "low" }).then(function (r) {
-          if (r.ok) cache.put(url, r).catch(function () {});      // ignore cache-write failures
-        }).catch(function () {});
-      });
-    }).catch(function () {});
-  };
-  if ("requestIdleCallback" in window) requestIdleCallback(warm, { timeout: 5000 });
-  else setTimeout(warm, 2500);
-})();
-</script>
-
+    </p></section>
+</main>
+<footer class="site-footer"><div class="inner">
+  <div><a class="footer-brand" href="./">RABBiT</a><p>Max Planck Institute for Software Systems</p></div>
+  <nav aria-label="Research resources"><a href="#results">Results</a><a href="#how">Methods</a><a href="#resources">Resources</a><a href="#cite">Citation</a></nav>
+</div></footer>
 </body>
 </html>

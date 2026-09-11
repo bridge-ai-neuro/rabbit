@@ -3,22 +3,23 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>RABBiT — live demo · speech → brain</title>
-<meta name="description" content="Live, fully client-side RABBiT demo: play a clip or speak into your mic and watch a held-out listener's predicted language-network fMRI on the cortex — runs entirely in your browser, no server." />
+<title>RABBiT — audio-to-fMRI demo</title>
+<meta name="description" content="Explore RABBiT population predictions of speech-evoked fMRI. Replay precomputed examples or use experimental microphone inference on a supported desktop browser." />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="RABBiT — live demo · speech → brain" />
-<meta property="og:description" content="Watch RABBiT predict a held-out listener's speech-evoked fMRI live in your browser." />
-<meta property="og:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/teaser.png" />
+<meta property="og:title" content="RABBiT — audio-to-fMRI demo" />
+<meta property="og:description" content="Precomputed prediction examples and experimental live microphone inference. RABBiT estimates population responses from audio without fitting to the visitor." />
+<meta property="og:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/hero_rabbit_poster.png" />
+<meta property="og:image:alt" content="RABBiT audio-to-fMRI illustration with predicted cortical BOLD." />
+<link rel="canonical" href="https://bridge-ai-neuro.github.io/rabbit/demo/">
+<meta property="og:url" content="https://bridge-ai-neuro.github.io/rabbit/demo/">
+<meta name="twitter:title" content="RABBiT — audio-to-fMRI demo">
+<meta name="twitter:description" content="Replay precomputed brain-response predictions or try experimental microphone inference.">
+<meta name="twitter:image" content="https://bridge-ai-neuro.github.io/rabbit/assets/hero_rabbit_poster.png">
+<meta name="twitter:image:alt" content="RABBiT predictions of speech-evoked brain activity.">
+<meta name="theme-color" content="#ffffff">
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" type="image/svg+xml" href="../assets/logo.svg" />
 <style>
-  :root {
-    --ink:#1c1c1a; --ink-soft:#45433d; --muted:#7d7972;
-    --line:#dcdbd6; --line-soft:#ebeae5; --bg:#fdfdfb; --bg-elev:#ffffff;
-    --steel:#6699cc; --wine:#882255;
-    --zero:#4f7fb3; --accent:#a82d4d;
-    --serif:"Iowan Old Style","Charter","Source Serif Pro",Georgia,"Times New Roman",serif;
-  }
   * { box-sizing: border-box; }
   html { height:100%; }
   body { margin:0; min-height:100%; height:100vh; display:flex; flex-direction:column;
@@ -115,52 +116,61 @@
     #capnote { left:10px; top:22%; bottom:auto; max-width:80%; font-size:10px; }
   }
 </style>
+<link rel="stylesheet" href="../assets/design-tokens.css?v=2">
+<link rel="stylesheet" href="../assets/demo-redesign.css?v=3">
 </head>
 <body>
-<nav class="topbar">
+<a class="skip-link" href="#main">Skip to demo controls</a>
+<nav class="topbar" aria-label="Main navigation">
   <a class="brand" href="../" aria-label="RABBiT — overview"><img src="../assets/rabbit-lockup-bigeye.png" alt="RABBiT"></a>
-  <span class="crumb">Live demo</span>
+  <span class="crumb">Browser demo</span>
   <span class="spacer"></span>
-  <a class="back" href="../">← Overview</a>
-  <a class="pill" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer">Paper</a>
-  <a class="pill" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer">Code</a>
+  <a class="back" href="../"><img class="icon" src="../assets/icons/arrow-left.svg" width="20" height="20" alt="" aria-hidden="true">Overview</a>
+  <a class="pill" href="https://arxiv.org/abs/2607.05171" target="_blank" rel="noopener noreferrer"><img class="icon" src="../assets/icons/file-text.svg" width="20" height="20" alt="" aria-hidden="true">Paper</a>
+  <a class="pill" href="https://github.com/bridge-ai-neuro/rabbit" target="_blank" rel="noopener noreferrer"><img class="icon" src="../assets/icons/code.svg" width="20" height="20" alt="" aria-hidden="true">Code</a>
 </nav>
 <header class="intro">
-  <h1>Speech → brain, live in your browser</h1>
-  <p>A held-out listener's language-network BOLD, predicted from speech by RABBiT — running fully client-side, zero-shot (no data from this person). Pick a clip, or speak into your mic.</p>
+  <h1>Explore speech-evoked fMRI predictions</h1>
+  <p>RABBiT estimates population BOLD responses from audio, without fitting to the visitor. Clips replay precomputed predictions; experimental microphone mode runs inference in your browser. The display shows model predictions, not a measurement of your brain activity.</p>
 </header>
 
-<div class="wrap">
-  <div id="view"><canvas id="brain" role="img" aria-label="Rotatable 3D cortical surface (both hemispheres) showing RABBiT's predicted brain activation"></canvas><div id="caption" aria-live="polite"></div><div id="capnote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Transcript is from an independent captioning model — not RABBiT's input.</span></div></div>
+<main class="wrap" id="main" tabindex="-1">
+  <noscript><p class="demo-error">The interactive demo needs JavaScript. <a href="../#top">View the recorded animation and paper results</a>.</p></noscript>
+  <div id="view"><canvas id="brain" tabindex="0" aria-describedby="view-help" role="img" aria-label="Rotatable 3D cortical surface (both hemispheres) showing RABBiT's predicted brain activation"></canvas><div id="caption" aria-label="Display-only transcript"></div><div id="capnote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Transcript is from an independent captioning model — not RABBiT's input.</span></div></div>
   <div class="panel">
     <div class="status" id="status" role="status" aria-live="polite">loading…</div>
     <div class="bar" id="barEl" role="progressbar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="prog"></i></div>
     <button id="retry" class="primary" hidden>↻ Retry</button>
 
     <div class="card off" id="clipCard">
-      <h2>Play a clip</h2>
-      <select id="clipSel" aria-label="Choose a demo clip"></select>
-      <button id="run" class="primary" aria-label="Play the selected clip">▶ Play</button>
+      <h2>Replay a prediction example</h2>
+      <p class="note">Precomputed predictions, synchronized with the original audio.</p>
+      <select id="clipSel" disabled aria-label="Choose a demo clip"></select>
+      <div class="playback-controls"><button id="run" class="primary" disabled>Play</button><button id="stopClip" disabled>Stop</button></div>
+      <div class="clip-timeline"><span id="clipTime">0:00 / 0:24</span><progress id="clipProgress" value="0" max="1" aria-label="Clip playback progress"></progress></div>
     </div>
 
     <div class="card off" id="micCard">
-      <h2>Use your microphone (live)</h2>
-      <button id="mic" class="mic" aria-pressed="false">● Start microphone</button>
-      <div class="micstat" id="micStatus" aria-live="polite"></div>
-      <div class="note" id="micNote"><strong>Experimental · desktop only.</strong> First use
-        downloads the ~420 MB model (cached after — one-time) and runs it on your CPU in a
-        background worker, so the brain refreshes every few seconds — speak continuously.</div>
+      <h2>Microphone inference (experimental)</h2>
+      <button id="loadModel" class="primary" disabled>Load microphone model (422 MB)</button>
+      <button id="cancelModel" hidden>Cancel loading</button>
+      <div class="micstat" id="micStatus" role="status"></div>
+      <progress id="modelProgress" max="1" value="0" hidden aria-label="Microphone model download"></progress>
+      <button id="mic" class="mic" disabled aria-pressed="false" aria-describedby="micNote">Start microphone</button>
+      <label class="caption-option"><input type="checkbox" id="liveCaptions" disabled> Include live captions</label>
+      <p class="note" id="captionNote">Optional captions download a separate speech-recognition model. They are display-only.</p>
+      <div class="note" id="micNote">Load the model first; then start your microphone. Weights are cached when browser storage allows. Audio is processed on this device. Allow about 10 seconds of audio context plus CPU processing time before the first prediction.</div>
     </div>
 
     <h2 style="margin-top:18px">Predicted activation</h2>
     <div class="legend"><span>deact.</span><span class="swatch"></span><span>act.</span></div>
 
-    <p class="hint">Drag to rotate · scroll to zoom. Two halves = left/right
-      hemispheres (pial fsaverage6).</p>
+    <p class="hint" id="view-help">Drag to rotate; scroll to zoom. With the brain focused, use arrow keys to rotate and +/− to zoom. Two halves show the left and right hemispheres (pial fsaverage6).</p>
+    <button id="resetView" disabled>Reset brain view</button>
 
     <p class="panel-back"><a href="../">← Back to the RABBiT overview</a></p>
   </div>
-</div>
+</main>
 
 <script type="importmap">
 { "imports": {
@@ -168,6 +178,13 @@
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
 } }
 </script>
-<script type="module" src="./app.js"></script>
+<script type="module">
+import('./app.js?v=3').catch(() => {
+  document.getElementById('status').textContent = 'The demo could not start. Check your connection and reload; its 3D modules need internet access.';
+  const retry = document.getElementById('retry');
+  retry.hidden = false; retry.textContent = 'Reload demo';
+  retry.onclick = () => location.reload();
+});
+</script>
 </body>
 </html>

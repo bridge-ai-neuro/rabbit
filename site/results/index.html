@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Results — RABBiT</title>
+<link rel="canonical" href="https://bridge-ai-neuro.github.io/rabbit/">
+<script>(() => {
+  const id = location.hash.slice(1);
+  const sections = ['zeroshot', 'fewshot', 'foundation'];
+  const target = new URL('../', location.href);
+  target.hash = sections.includes(id) ? id : 'results';
+  location.replace(target.href);
+})();</script>
+<noscript><meta http-equiv="refresh" content="0;url=../#results"></noscript>
+</head><body><p><a href="../#results">Continue to results in the RABBiT research page.</a></p></body></html>

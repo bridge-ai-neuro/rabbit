@@ -1,9 +1,9 @@
 # RABBiT web demo — speech → fMRI, fully client-side
 
 This is the live demo for the RABBiT project page; it lives at `site/demo/` and
-links back to the landing page (`../`). Play a clip or speak into your mic →
-RABBiT predicts a held-out listener's language-network BOLD → painted on the
-fsaverage6 cortex, entirely in the browser (ONNX Runtime Web). No model server.
+links back to the paper page (`../`). Recorded examples replay saved population
+predictions. Experimental microphone mode runs RABBiT inference on audio in a
+browser worker; it does not measure or personalize to the visitor's brain.
 Colourmap matches the website hero video (`site/assets/hero_build/
 brain_render.py`): uniform neutral cortex, `|value| < 0.05` stays neutral, the
 salient steel→neutral→orange→crimson BOLD map for activation.
@@ -26,9 +26,16 @@ node serve.mjs             # http://localhost:8000   (MIME + HTTP range requests
 # or: python3 -m http.server 8000   (works, but no range streaming for .onnx)
 ```
 
-Pick a clip → **▶ Play**, or **● Start microphone**. Needs internet for the
-Three.js + onnxruntime-web + Transformers.js CDN modules. Clip mode is
-precomputed (instant); mic mode runs the model live in a Web Worker.
+Choose an example and **Play**, **Pause/Resume**, or **Stop**. Changing examples
+stops old audio; starting either microphone or clip playback stops the other.
+Brain frames and clip captions follow the AudioContext clock, including pauses.
+
+For microphone mode, choose **Load microphone model (422 MB)**. Download and
+initialization have separate states; Cancel and Retry are available. Start the
+microphone only after the model is ready. Expect about ten seconds of context
+plus CPU processing before the first prediction. Internet access is needed for
+Three.js and ONNX runtime modules; weights are cached where supported. Optional
+live captions explicitly load their own model and do not feed text to RABBiT.
 
 ## How it works
 
@@ -68,7 +75,7 @@ publishing `site/` (see `../README.md`) puts the demo live at
 
 Clip mode works out of the box. For **mic mode**, the 422 MB ONNX weight
 exceeds the Pages 100 MB file limit — host it on the Hugging Face Hub or a CDN
-(still serverless) and point `MODEL_URLS` in `app.js` at that URL. `assets/
+(still serverless) and configure `model-loader.mjs`. `assets/
 rabbit_fp32.onnx` is a symlink to `../../scripts/_onnx_proto_out/` for local
 dev; do not commit the resolved blob. Do **not** set COOP/COEP — it breaks
 onnxruntime-web's worker (see the note in `serve.mjs`).
@@ -83,3 +90,17 @@ onnxruntime-web's worker (see the note in `serve.mjs`).
   full / 0.98 backbone-only — visible degradation).
 - Few-shot is not live (needs the viewer's own fMRI); show as a JS α-fit replay
   on stored subjects.
+
+## Website QA (2026-09-09)
+
+The current lifecycle, responsive, and error-state browser checks are under
+`../../design-review/check-fixes-6-7.mjs`; they use real recorded clips and
+controlled model workers/synthetic microphone streams. The separate
+`check-real-demo-model.mjs` exercises the actual ONNX worker with recorded speech
+fed through a synthetic microphone stream. Both open no server port and access
+no microphone hardware. See `../design-qa.md` for outcomes and limits.
+
+`model-loader.mjs` is the sole model URL/revision/cache configuration. Neither
+page downloads weights automatically. Older prefetch/gating tests in
+`node_check/` target the previous behavior and should not be used as acceptance
+checks for explicit model loading.
